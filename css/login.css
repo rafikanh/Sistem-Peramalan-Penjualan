@@ -1,35 +1,32 @@
+html,
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: url(../assets/img/background.jpg) no-repeat center center fixed;
-    background-size: cover;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* .gradient-custom { */
-    /* fallback for old browsers */
-    /* background: #bd80ff; */
-    
-    /* Chrome 10-25, Safari 5.1-6 */
-    /* background: -webkit-linear-gradient(to right, rgb(196, 140, 255), rgb(127, 174, 255)); */
-    
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    /* background: linear-gradient(to right, rgba(196, 140, 255), rgba(127, 174, 255)) */
-/* } */
+.gradient-custom {
+  background: rgba(255, 255, 255, 0.5) url(../assets/img/background.jpg) no-repeat center center fixed;
+  background-size: cover;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+
+}
 
 .logo {
-    height: 130px;
-    width: 130px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  height: 130px;
+  width: 130px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 h3 {
-    font-size: 30px;
-    text-align: center;
+  font-size: 30px;
+  text-align: center;
 }
 
 .btn {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

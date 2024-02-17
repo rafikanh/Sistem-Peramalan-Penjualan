@@ -1,12 +1,14 @@
 <?php
-$host ="localhost";
-$username ="root";
-$pass ="";
-
+$servername = "localhost";
+$username = "root";
+$password = "";
 $dbname = "peramalan";
-$koneksi = mysqli_connect($host, $username, $pass, $dbname);
 
-if (!$koneksi) {
-    die("Database tidak dapat terhubung: " . mysqli_connect_error());
+// Buat koneksi
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Periksa koneksi
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 ?>

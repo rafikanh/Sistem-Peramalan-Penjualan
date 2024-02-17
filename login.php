@@ -1,25 +1,3 @@
-<?php
-include './koneksi.php';
-session_start();
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-
-    $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
-    $result = mysqli_query($koneksi, $sql);
-
-    echo mysqli_num_rows($result)>1;
-    if ($result->num_rows > 0) {
-        header("Location: sidebar.php");
-        exit();
-    } else {
-        // echo "Login gagal. Periksa kembali email dan password Anda." .mysqli_error($koneksi);
-        print (mysqli_error($koneksi));
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-    <section class="100vh gradient-custom">
+    <section class="gradient-custom">
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -46,17 +24,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             <h3 class="mb-4"><b>LOGIN</b></h3>
 
-                            <form action="login.php" method="POST">
+                            <form action="login_proses.php" method="POST">
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email" aria-describedby="emailHelp">
+                                    <input type="email" class="form-control" id="email" name="email" autocomplete="email" placeholder="Masukkan email" aria-describedby="emailHelp" required>
                                 </div>
                                 <div class="mb-2">
                                     <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password">
+                                    <input type="password" class="form-control" id="password" name="password" autocomplete="password" placeholder="Masukkan password" required>
                                 </div>
                                 <div class="mb-5">
-                                    <input type="checkbox" onclick="myFunction()"> Tampilkan Password
+                                    <input type="checkbox" id="showPassword" onclick="myFunction()">
+                                    <label for="showPassword">Tampilkan Password</label>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </form>
