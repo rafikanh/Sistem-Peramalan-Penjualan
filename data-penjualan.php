@@ -15,9 +15,9 @@
     <?php include 'sidebar.php'; ?>
     <div class="content-large">
         <div class="container-fluid">
-            <h1>Data Barang</h1>
+            <h1>Data Penjualan</h1>
             <div class="d-flex mb-4">
-                <a href="add-data-barang.php" class="btn btn-primary me-2 flex-shrink-0">Tambah Data</a>
+                <a href="add-data-penjualan.php" class="btn btn-primary me-2 flex-shrink-0">Tambah Data</a>
                 <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search">
                 <button class="btn btn-outline-dark flex-shrink-0" type="submit">
                     <i class="bi bi-search"></i>
@@ -29,8 +29,10 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
+                            <th scope="col">Bulan - Tahun</th>
                             <th scope="col">Merek</th>
                             <th scope="col">Tipe</th>
+                            <th scope="col">Nilai Aktual</th>
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>
@@ -38,10 +40,12 @@
                         <?php for ($i = 1; $i <= 20; $i++) : ?>
                             <tr>
                                 <th class="align-middle" scope="row">1</th>
+                                <td class="align-middle">Januari 2021</td>
                                 <td class="align-middle">ACER</td>
                                 <td class="align-middle">ASPIRE 3 A314</td>
+                                <td class="align-middle">20</td>
                                 <td class="d-flex">
-                                    <a href="update-data-barang.php" type="button" class="btn btn-warning me-2">
+                                    <a href="update-data-penjualan.php" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <button type="button" class="btn btn-danger">

@@ -35,7 +35,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link link-dark">
+                    <a href="data-penjualan.php" class="nav-link link-dark">
                         <i class="bi bi-receipt"></i></i>&ensp;
                         Data Penjualan
                     </a>
@@ -47,14 +47,14 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link link-dark">
+                    <a href="user-manajemen.php" class="nav-link link-dark">
                         <i class="bi bi-people"></i>&ensp;
                         User Manajemen
                     </a>
                 </li>
             </ul>
             <hr>
-            <a href="login.php" class="nav-link link-logout">
+            <a href="index.php" class="nav-link link-logout">
                 <i class="bi bi-box-arrow-left"></i></i>&ensp;
                 Keluar
             </a>

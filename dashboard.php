@@ -13,7 +13,7 @@
 
 <body>
     <?php include 'sidebar.php'; ?>
-    <div class="content">
+    <div class="content-large">
         <div class="container-fluid">
             <h1>Hai, Admin!</h1>
             <p>Selamat datang di website Sistem Peramalan Penjualan</p>

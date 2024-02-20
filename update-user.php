@@ -15,21 +15,21 @@
     <?php include 'sidebar.php'; ?>
     <div class="content-small">
         <div class="container-fluid">
-            <h1 class="mb-4">Tambah Data Barang</h1>
+            <h1 class="mb-4">Update User</h1>
             <div class="d-flex">
                 <div class="mb-3">
-                    <label for="merek" class="input-data-label">Merek</label>
-                    <input type="text" class="input-data" id="merek" placeholder="Masukkan merek laptop">
+                    <label for="email" class="input-data-label">Email</label>
+                    <input type="text" class="input-data" id="email" placeholder="Masukkan email">
                 </div>
                 <div class="mb-3 ms-5">
-                    <label for="tipe" class="input-data-label">Tipe</label>
-                    <input type="text" class="input-data" id="tipe" placeholder="Masukkan tipe laptop">
+                    <label for="password" class="input-data-label">Passowrd</label>
+                    <input type="text" class="input-data" id="password" placeholder="Masukkan password">
                 </div>
             </div>
 
             <div class="d-flex">
-                <a href="data-barang.php" class="btn btn-success me-2">Simpan Data</a>
-                <a href="data-barang.php" class="btn btn-secondary">Batal</a>
+                <a href="user-manajemen.php" class="btn btn-warning me-2">Update Data</a>
+                <a href="user-manajemen.php" class="btn btn-secondary">Batal</a>
             </div>
         </div>
 

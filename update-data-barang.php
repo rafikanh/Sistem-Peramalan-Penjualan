@@ -13,7 +13,7 @@
 
 <body>
     <?php include 'sidebar.php'; ?>
-    <div class="content">
+    <div class="content-small">
         <div class="container-fluid">
             <h1 class="mb-4">Update Data Barang</h1>
             <div class="d-flex">
