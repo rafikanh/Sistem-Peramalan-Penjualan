@@ -41,7 +41,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link link-dark">
+                    <a href="forecasting.php" class="nav-link link-dark">
                         <i class="bi bi-clipboard-data"></i>&ensp;
                         Peramalan
                     </a>

@@ -14,7 +14,7 @@ body {
   margin-left: 25px;
   margin-right: 25px;
   width: calc(100% - 320px);
-  height: 300px;
+  height: 320px;
   border-radius: 5px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
 }
@@ -26,23 +26,28 @@ body {
   margin-left: 25px;
   margin-right: 25px;
   width: calc(100% - 320px);
-  height: 400px;
+  height: 420px;
   border-radius: 5px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 .content-large {
   background-color: #f0f0f0;
-  padding: 50px;
-  margin: 50px 25px;
+  padding: 30px 50px;
+  margin: 25px;
   width: calc(100% - 320px);
   height: auto;
   border-radius: 5px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: scroll;
 }
 
 p {
   font-size: 25px;
+}
+
+.text-forecasting {
+  font-size: 20px;
 }
 
 .form-control {
@@ -54,11 +59,12 @@ p {
   top: 0;
   background-color: #dcdcdc;
   border-bottom: none;
+  vertical-align: middle !important;
 }
 
 .scrollable-table-container {
   overflow-y: scroll;
-  max-height: 320px;
+  max-height: 380px;
   background-color: #ececec;
 }
 
@@ -74,6 +80,13 @@ p {
   border-radius: 5px;
 }
 
+.input-data-forecasting {
+  width: 250px;
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
 .input-data-label {
   display: block;
   margin-bottom: 8px;
@@ -81,7 +94,7 @@ p {
 }
 
 select.form-select {
-  width: 350px; 
+  width: 350px;
   padding: 6px 12px;
   margin-bottom: 16px;
   border: 1px solid #ced4da;
@@ -124,4 +137,8 @@ select.form-select {
 
 .option:hover {
   background-color: #f0f0f0;
+}
+
+.beta {
+  margin-right: 10px;
 }
