@@ -24,7 +24,7 @@
 
                             <h3 class="mb-4"><b>LOGIN</b></h3>
 
-                            <form action="login_proses.php" method="POST">
+                            <form action="./process/login_proses.php" method="POST">
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control" id="email" name="email" autocomplete="email" placeholder="Masukkan email" aria-describedby="emailHelp" required>

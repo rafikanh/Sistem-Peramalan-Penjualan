@@ -1,6 +1,6 @@
 <?php
 // Sertakan file konfigurasi database
-require_once "koneksi.php";
+require_once "../koneksi.php";
 
 // Mengambil nilai dari form login
 $email = $_POST['email'];
@@ -17,7 +17,7 @@ if ($result->num_rows > 0) {
     // Login berhasil
     session_start();
     $_SESSION['email'] = $email;
-    header("Location: dashboard.php"); // Ganti dashboard.php dengan halaman setelah login
+    header("Location: ../view/dashboard.php"); // Ganti dashboard.php dengan halaman setelah login
 } else {
     // Login gagal
     echo "Email atau password salah.";
