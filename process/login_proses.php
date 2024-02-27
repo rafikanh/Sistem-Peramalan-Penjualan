@@ -20,7 +20,7 @@ if ($result->num_rows > 0) {
     header("Location: ../view/dashboard.php"); // Ganti dashboard.php dengan halaman setelah login
 } else {
     // Login gagal
-    echo "Email atau password salah.";
+    echo "<script>alert('Email atau password salah.'); window.location.href = '../index.php';</script>";
 }
 
 $conn->close();
