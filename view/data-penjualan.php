@@ -28,7 +28,6 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
                             <th scope="col">Bulan - Tahun</th>
                             <th scope="col">Merek</th>
                             <th scope="col">Tipe</th>
@@ -39,7 +38,6 @@
                     <tbody>
                         <?php for ($i = 1; $i <= 20; $i++) : ?>
                             <tr>
-                                <th class="align-middle" scope="row">1</th>
                                 <td class="align-middle">Januari 2021</td>
                                 <td class="align-middle">ACER</td>
                                 <td class="align-middle">ASPIRE 3 A314</td>

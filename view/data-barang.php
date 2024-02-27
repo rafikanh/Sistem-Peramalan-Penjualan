@@ -28,19 +28,17 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Merek</th>
-                            <th scope="col">Tipe</th>
-                            <th scope="col">Aksi</th>
+                            <th scope="col" class="text-center">Merek</th>
+                            <th scope="col" class="text-center">Tipe</th>
+                            <th scope="col" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php for ($i = 1; $i <= 20; $i++) : ?>
                             <tr>
-                                <th class="align-middle" scope="row">1</th>
-                                <td class="align-middle">ACER</td>
-                                <td class="align-middle">ASPIRE 3 A314</td>
-                                <td class="d-flex">
+                                <td class="align-middle text-center">ACER</td>
+                                <td class="align-middle text-center">ASPIRE 3 A314</td>
+                                <td class="d-flex justify-content-center">
                                     <a href="../view/update-data-barang.php" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>

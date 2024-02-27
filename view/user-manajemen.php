@@ -42,7 +42,6 @@
             echo "<table class='table'>";
             echo "<thead>
                 <tr>
-                    <th scope='col'>#</th>
                     <th scope='col'>Email</th>
                     <th scope='col'>Password</th>
                     <th scope='col'>Aksi</th>
@@ -50,26 +49,35 @@
             </thead>
             <tbody>";
 
+            // Fungsi untuk mendekripsi password
+            function decryptPassword($encryptedPassword)
+            {
+                return md5($encryptedPassword); // Ini hanya contoh, sebaiknya diganti dengan metode dekripsi yang aman
+            }
+
+            // ...
+
             while ($row = $result->fetch_assoc()) {
                 $userID = $row['id'];
                 $email = $row['email'];
-                $password = $row['password']; // Ini dianggap masih dalam format MD5
+                $encryptedPassword = $row['password'];
+
+                // Dekripsi password (contoh, sebaiknya ganti dengan metode dekripsi yang aman)
+                $password = decryptPassword($encryptedPassword);
 
                 // Tampilkan data dalam tabel
                 echo "<tr>
-                        <th class='align-middle' scope='row'>$userID</th>
-                        <td class='align-middle'>$email</td>
-                        <td class='align-middle' id='password-cell-$userID'>$password</td>
-                        <td class='d-flex'>
-                            <a href='../viwe/update-user.php?id=$userID' type='button' class='btn btn-warning me-2'>
-                                <i class='bi bi-pencil-square'></i>
-                            </a>
-                            <a href='../process/delete-user.php?id=$userID;' type='button' class='btn btn-danger'>
-                                <i class='bi bi-trash'></i>
-                            </a>
-
-                        </td>
-                    </tr>";
+                    <td class='align-middle'>$email</td>
+                    <td class='align-middle' id='password-cell-$userID'>$password</td>
+                    <td class='d-flex'>
+                        <a href='../view/update-user.php?id=$userID' type='button' class='btn btn-warning me-2'>
+                            <i class='bi bi-pencil-square'></i>
+                        </a>
+                        <a href='../process/delete-user.php?id=$userID;' type='button' class='btn btn-danger'>
+                            <i class='bi bi-trash'></i>
+                        </a>
+                    </td>
+                </tr>";
             }
 
             echo "</tbody></table></div>";
@@ -80,8 +88,8 @@
         </div>
     </div>
 
+    <!-- Mengganti teks dengan bintang-bintang pada elemen dengan id "password-cell" -->
     <script>
-        // Mengganti teks dengan bintang-bintang pada elemen dengan id "password-cell"
         <?php
         $result->data_seek(0);
         while ($row = $result->fetch_assoc()) {
