@@ -29,11 +29,42 @@
                 </div>
 
                 <div class="d-flex">
-                    <button type="submit" class="btn btn-success me-2">Simpan Data</button>
+                    <button type="button" class="btn btn-success me-2" id="saveBtn">Simpan Data</button>
                     <a href="../view/user-manajemen.php" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>
+
+        <!-- SweetAlert2 script -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            document.getElementById('saveBtn').addEventListener('click', function() {
+                Swal.fire({
+                    title: "Apakah Anda ingin menyimpan perubahan?",
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: "Simpan",
+                    denyButtonText: `Jangan Simpan`,
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // If user clicks "Save", submit the form
+                        Swal.fire({
+                            title: "Tersimpan!",
+                            text: "Perubahan yang Anda buat sudah disimpan.",
+                            icon: "success",
+                            timer: 10000,
+                            showConfirmButton: false
+                        });
+                        document.querySelector('form').submit();
+                    } else if (result.isDenied) {
+                        Swal.fire("Perubahan tidak disimpan", "", "info");
+                        window.history.back();
+                    }
+                });
+            });
+        </script>
 
         <!-- Bootstrap -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
