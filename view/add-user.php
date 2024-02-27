@@ -20,31 +20,49 @@
                 <div class="d-flex">
                     <div class="mb-3">
                         <label for="email" class="input-data-label">Email</label>
-                        <input type="text" class="input-data" name="email" id="email" placeholder="Masukkan email">
+                        <input type="text" class="input-data" name="email" id="email" placeholder="Masukkan email" required>
                     </div>
                     <div class="mb-3 ms-5">
                         <label for="password" class="input-data-label">Password</label>
-                        <input type="password" class="input-data" name="password" id="password" placeholder="Masukkan password">
+                        <div class="input-group">
+                            <input type="password" class="input-data" name="password" id="password" placeholder="Masukkan password" required>
+                            <i class="bi bi-eye-fill" id="togglePassword"></i>
+                        </div>
                     </div>
                 </div>
 
                 <div class="d-flex">
-                    <button type="button" class="btn btn-success me-2" id="saveBtn">Simpan Data</button>
+                    <button type="submit" class="btn btn-custom me-2" id="saveBtn">Simpan Data</button>
                     <a href="../view/user-manajemen.php" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>
 
+        <script>
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.classList.remove('bi-eye-fill');
+                    this.classList.add('bi-eye-slash-fill');
+                } else {
+                    passwordInput.type = 'password';
+                    this.classList.remove('bi-eye-slash-fill');
+                    this.classList.add('bi-eye-fill');
+                }
+            });
+        </script>
+
         <!-- SweetAlert2 script -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
-            document.getElementById('saveBtn').addEventListener('click', function() {
+            document.getElementById('saveBtn').addEventListener('submit', function() {
                 Swal.fire({
                     title: "Apakah Anda ingin menyimpan perubahan?",
                     showDenyButton: true,
                     showCancelButton: true,
-                    confirmButtonText: "Simpan",
+                    confirmButtonText: "Ya, Simpan",
                     denyButtonText: `Jangan Simpan`,
                     cancelButtonText: "Batal"
                 }).then((result) => {
