@@ -38,6 +38,7 @@
             </form>
         </div>
 
+        <!-- Show or Hide Password -->
         <script>
             document.getElementById('togglePassword').addEventListener('click', function() {
                 const passwordInput = document.getElementById('password');
