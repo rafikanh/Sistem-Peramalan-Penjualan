@@ -18,11 +18,29 @@
             <h1>Data Barang</h1>
             <div class="d-flex mb-4">
                 <a href="add-data-barang.php" class="btn btn-primary me-2 flex-shrink-0">Tambah Data</a>
-                <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search">
-                <button class="btn btn-outline-dark flex-shrink-0" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
+                <form class="d-flex" action="" method="post">
+                    <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query">
+                    <button class="btn btn-outline-dark flex-shrink-0" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
             </div>
+
+            <?php
+            // Sertakan file koneksi
+            include '../koneksi.php';
+
+            // Ambil nilai dari form pencarian
+            $searchQuery = $_POST['search_query'] ?? '';
+
+            // Query SQL untuk mengambil data dari tabel dt_barang
+            $sql = "SELECT id_brg, merek, tipe FROM dt_barang WHERE merek LIKE '%$searchQuery%' OR tipe LIKE '%$searchQuery%'";
+            $result = $conn->query($sql);
+
+            if ($result === false) {
+                die("Error executing the query: " . $conn->error);
+            }
+            ?>
 
             <div class="scrollable-table-container">
                 <table class="table">
@@ -34,23 +52,29 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php for ($i = 1; $i <= 20; $i++) : ?>
+                        <?php while ($row = $result->fetch_assoc()) : ?>
                             <tr>
-                                <td class="align-middle text-center">ACER</td>
-                                <td class="align-middle text-center">ASPIRE 3 A314</td>
+                                <td class="align-middle text-center"><?php echo $row['merek']; ?></td>
+                                <td class="align-middle text-center"><?php echo $row['tipe']; ?></td>
                                 <td class="d-flex justify-content-center">
-                                    <a href="../view/update-data-barang.php" type="button" class="btn btn-warning me-2">
+                                    <a href="../view/update-data-barang.php?id=<?php echo $row['id_brg']; ?>" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-                                    <button type="button" class="btn btn-danger">
+                                    <a href="../process/delete-data-barang.php?id=<?php echo $row['id_brg']; ?>" type="button" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                         <i class="bi bi-trash"></i>
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
-                        <?php endfor; ?>
+                        <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
+
+            <?php
+            // Tutup koneksi
+            $conn->close();
+            ?>
+
         </div>
     </div>
 
