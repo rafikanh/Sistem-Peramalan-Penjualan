@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="d-flex">
-                    <button type="submit" class="btn btn-custom me-2" id="saveBtn">Simpan Data</button>
+                    <button type="button" class="btn btn-custom me-2" id="saveBtn">Simpan Data</button>
                     <a href="../view/user-manajemen.php" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
@@ -58,30 +58,48 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
-            document.getElementById('saveBtn').addEventListener('submit', function() {
-                Swal.fire({
-                    title: "Apakah Anda ingin menyimpan perubahan?",
-                    showDenyButton: true,
-                    showCancelButton: true,
-                    confirmButtonText: "Ya, Simpan",
-                    denyButtonText: `Jangan Simpan`,
-                    cancelButtonText: "Batal"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // If user clicks "Save", submit the form
-                        Swal.fire({
-                            title: "Tersimpan!",
-                            text: "Perubahan yang Anda buat sudah disimpan.",
-                            icon: "success",
-                            timer: 10000,
-                            showConfirmButton: false
-                        });
-                        document.querySelector('form').submit();
-                    } else if (result.isDenied) {
-                        Swal.fire("Perubahan tidak disimpan", "", "info");
-                        window.history.back();
-                    }
-                });
+            document.getElementById('saveBtn').addEventListener('click', function() {
+                // Mendapatkan semua input data
+                const emailInput = document.getElementById('email');
+                const passwordInput = document.getElementById('password');
+
+                // Memeriksa apakah kedua input sudah diisi atau belum
+                const isFormFilled = emailInput.value.trim() !== '' && passwordInput.value.trim() !== '';
+
+                // Memeriksa apakah formulir valid atau tidak
+                const isFormValid = isFormFilled; // Tambahkan kondisi validasi formulir sesuai kebutuhan
+
+                if (isFormValid) {
+                    Swal.fire({
+                        title: "Apakah Anda ingin menyimpan data baru?",
+                        showDenyButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: "Ya, Simpan",
+                        denyButtonText: `Jangan Simpan`,
+                        cancelButtonText: "Batal"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Jika pengguna mengklik "Ya, Simpan", tampilkan pesan "Tersimpan!" dan kirim formulir setelahnya
+                            Swal.fire({
+                                title: "Tersimpan!",
+                                text: "Data baru yang Anda buat sudah disimpan.",
+                                icon: "success",
+                                showConfirmButton: true,
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                document.querySelector('form').submit();
+                            });
+                        } else if (result.isDenied) {
+                            // Jika pengguna memilih "Jangan Simpan", tampilkan pesan informasi dan kembali ke halaman sebelumnya
+                            Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
+                                window.history.back();
+                            });
+                        }
+                    });
+                } else {
+                    // Menampilkan pesan bahwa data harus diisi
+                    Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
+                }
             });
         </script>
 
