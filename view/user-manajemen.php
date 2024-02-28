@@ -73,7 +73,7 @@
                         <a href='../view/update-user.php?id=$userID' type='button' class='btn btn-warning me-2'>
                             <i class='bi bi-pencil-square'></i>
                         </a>
-                        <a href='../process/delete-user.php?id=$userID;' type='button' class='btn btn-danger'>
+                        <a href='#' onclick='confirmDelete($userID)' class='btn btn-danger'>
                             <i class='bi bi-trash'></i>
                         </a>
                     </td>
@@ -87,6 +87,29 @@
             ?>
         </div>
     </div>
+
+    <!-- SweetAlert2 script -->
+    <?php
+    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        <script>
+            function confirmDelete(userID) {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Anda tidak akan dapat mengembalikan ini!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '../process/delete-user.php?id=' + userID;
+                    }
+                });
+            }
+        </script>";
+    ?>
 
     <!-- Mengganti teks dengan bintang-bintang pada elemen dengan id "password-cell" -->
     <script>
