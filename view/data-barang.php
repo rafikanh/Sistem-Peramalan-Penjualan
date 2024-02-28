@@ -60,9 +60,9 @@
                                     <a href="../view/update-data-barang.php?id=<?php echo $row['id_brg']; ?>" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-                                    <a href="../process/delete-data-barang.php?id=<?php echo $row['id_brg']; ?>" type="button" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                    <button type='button' class='btn btn-danger' onclick='confirmDelete(<?php echo $row['id_brg']; ?>)'>
+                                        <i class='bi bi-trash'></i>
+                                    </button>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -77,6 +77,29 @@
 
         </div>
     </div>
+
+    <!-- SweetAlert2 script hapus data -->
+    <?php
+    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        <script>
+            function confirmDelete(userID) {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Anda tidak akan dapat mengembalikan ini!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '../process/delete-data-barang.php?id=' + userID;
+                    }
+                });
+            }
+        </script>";
+    ?>
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
