@@ -30,15 +30,15 @@
                                     <input type="email" class="form-control" id="email" name="email" autocomplete="email" placeholder="Masukkan email" aria-describedby="emailHelp" required>
                                     <div class="invalid-feedback">Email atau password salah.</div>
                                 </div>
-                                <div class="mb-2">
+                                <div class="mb-4">
                                     <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" autocomplete="password" placeholder="Masukkan password" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="password" name="password" autocomplete="password" placeholder="Masukkan password" required>
+                                        <i class="bi bi-eye-fill" id="togglePassword"></i>
+                                    </div>
                                     <div class="invalid-feedback">Email atau password salah.</div>
                                 </div>
-                                <div class="mb-5">
-                                    <input type="checkbox" id="showPassword" onclick="myFunction()">
-                                    <label for="showPassword">Tampilkan Password</label>
-                                </div>
+
                                 <input type="hidden" name="action" value="login">
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </form>
@@ -49,16 +49,20 @@
         </div>
     </section>
 
-    <!-- Show/hide Password -->
+    <!-- Show or hide Password -->
     <script>
-        function myFunction() {
-            var x = document.getElementById("password");
-            if (x.type === "password") {
-                x.type = "text";
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('bi-eye-fill');
+                this.classList.add('bi-eye-slash-fill');
             } else {
-                x.type = "password";
+                passwordInput.type = 'password';
+                this.classList.remove('bi-eye-slash-fill');
+                this.classList.add('bi-eye-fill');
             }
-        }
+        });
     </script>
 
     <!-- Bootstrap -->

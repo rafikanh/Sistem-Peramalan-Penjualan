@@ -37,3 +37,13 @@ h3 {
   margin-left: auto;
   margin-right: auto;
 }
+
+.input-group .bi {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
