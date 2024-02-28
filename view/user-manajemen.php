@@ -42,9 +42,9 @@
             echo "<table class='table'>";
             echo "<thead>
                 <tr>
-                    <th scope='col'>Email</th>
-                    <th scope='col'>Password</th>
-                    <th scope='col'>Aksi</th>
+                    <th scope='col' class='text-center'>Email</th>
+                    <th scope='col' class='text-center'>Password</th>
+                    <th scope='col' class='text-center'>Aksi</th>
                 </tr>
             </thead>
             <tbody>";
@@ -67,9 +67,9 @@
 
                 // Tampilkan data dalam tabel
                 echo "<tr>
-                    <td class='align-middle'>$email</td>
-                    <td class='align-middle' id='password-cell-$userID'>$password</td>
-                    <td class='d-flex'>
+                    <td class='align-middle text-center'>$email</td>
+                    <td class='align-middle text-center' id='password-cell-$userID'>$password</td>
+                    <td class='d-flex justify-content-center'>
                         <a href='../view/update-user.php?id=$userID' type='button' class='btn btn-warning me-2'>
                             <i class='bi bi-pencil-square'></i>
                         </a>
