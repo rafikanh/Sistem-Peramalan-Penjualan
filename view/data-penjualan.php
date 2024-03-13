@@ -17,12 +17,40 @@
         <div class="container-fluid">
             <h1>Data Penjualan</h1>
             <div class="d-flex mb-4">
-                <a href="../view/add-data-penjualan.php" class="btn btn-primary me-2 flex-shrink-0">Tambah Data</a>
-                <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search">
-                <button class="btn btn-outline-dark flex-shrink-0" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
+                <a href="../view/add-data-penjualan.php" class="btn btn-primary me-5 flex-shrink-0">Tambah Data</a>
+                <form class="d-flex" action="" method="post">
+                    <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query">
+                    <button class="btn btn-outline-dark flex-shrink-0" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
             </div>
+
+            <?php
+            // Sertakan file koneksi
+            include '../koneksi.php';
+
+            // Inisialisasi variabel pencarian
+            $search_query = isset($_POST['search_query']) ? $_POST['search_query'] : '';
+
+            // Query SQL untuk mengambil data penjualan dengan informasi merek, tipe, bulan, dan tahun
+            $sql = "SELECT dp.id_penjualan, DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, db.merek, db.tipe, dp.dt_aktual 
+            FROM dt_penjualan dp
+            INNER JOIN dt_barang db ON dp.id_brg = db.id_brg";
+
+            // Tambahkan filter berdasarkan kriteria pencarian jika ada
+            if (!empty($search_query)) {
+                $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%'";
+            }
+
+            $result = $conn->query($sql);
+
+            // Periksa keberhasilan eksekusi query
+            if ($result === false) {
+                die("Error executing the query: " . $conn->error);
+            }
+            ?>
+
 
             <div class="scrollable-table-container">
                 <table class="table">
@@ -36,14 +64,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php for ($i = 1; $i <= 20; $i++) : ?>
+                        <?php while ($row = $result->fetch_assoc()) : ?>
                             <tr>
-                                <td class="align-middle">Januari 2021</td>
-                                <td class="align-middle">ACER</td>
-                                <td class="align-middle">ASPIRE 3 A314</td>
-                                <td class="align-middle">20</td>
+                                <td class="align-middle"><?php echo $row['bulan_tahun']; ?></td>
+                                <td class="align-middle"><?php echo $row['merek']; ?></td>
+                                <td class="align-middle"><?php echo $row['tipe']; ?></td>
+                                <td class="align-middle"><?php echo $row['dt_aktual']; ?></td>
                                 <td class="d-flex">
-                                    <a href="../view/update-data-penjualan.php" type="button" class="btn btn-warning me-2">
+                                    <a href="../view/update-data-penjualan>" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <button type="button" class="btn btn-danger">
@@ -51,7 +79,7 @@
                                     </button>
                                 </td>
                             </tr>
-                        <?php endfor; ?>
+                        <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
