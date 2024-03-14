@@ -13,61 +13,254 @@
 
 <body>
     <?php include '../view/component/sidebar.php'; ?>
-    <div class="content-medium">
+    <div class="content-large">
         <div class="container-fluid">
             <h1 class="mb-4">Tambah Data Penjualan</h1>
-            <div class="d-flex">
-                <div class="mb-3">
-                    <label for="bulan" class="input-data-label">Bulan</label>
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected>Pilih bulan</option>
-                        <option value="1">Januari</option>
-                        <option value="2">Februari</option>
-                        <option value="3">Maret</option>
-                    </select>
+
+            <?php
+            // Sertakan file koneksi
+            include '../koneksi.php';
+
+            // Query SQL untuk mengambil data bulan dari tabel dt_penjualan tanpa duplikasi
+            $sql_bulan = "SELECT DISTINCT bulan FROM dt_penjualan";
+            $result_bulan = $conn->query($sql_bulan);
+
+            // Periksa apakah query berhasil dieksekusi
+            if ($result_bulan === false) {
+                die("Error executing the query for month: " . $conn->error);
+            }
+
+            // Query SQL untuk mengambil data tahun dari tabel dt_penjualan tanpa duplikasi
+            $sql_tahun = "SELECT DISTINCT tahun FROM dt_penjualan";
+            $result_tahun = $conn->query($sql_tahun);
+
+            // Periksa apakah query berhasil dieksekusi
+            if ($result_tahun === false) {
+                die("Error executing the query for year: " . $conn->error);
+            }
+
+            // Query SQL untuk mengambil data merek dari tabel dt_barang tanpa duplikasi
+            $sql_merek = "SELECT DISTINCT merek FROM dt_barang";
+            $result_merek = $conn->query($sql_merek);
+
+            // Periksa apakah query berhasil dieksekusi
+            if ($result_merek === false) {
+                die("Error executing the query for brand: " . $conn->error);
+            }
+
+            // Inisialisasi array untuk menyimpan data merek
+            $merekOptions = [];
+
+            // Loop untuk menyimpan data merek dalam array
+            while ($row = $result_merek->fetch_assoc()) {
+                $merekOptions[] = $row['merek'];
+            }
+
+            // Mendefinisikan struktur data untuk menyimpan tipe berdasarkan merek
+            $tipeData = [];
+
+            // Loop untuk mengambil data tipe untuk setiap merek
+            foreach ($merekOptions as $merek) {
+                // Query SQL untuk mengambil data tipe untuk merek tertentu
+                $sql_tipe_per_merek = "SELECT DISTINCT tipe FROM dt_barang WHERE merek = '$merek'";
+                $result_tipe_per_merek = $conn->query($sql_tipe_per_merek);
+
+                // Periksa apakah query berhasil dieksekusi
+                if ($result_tipe_per_merek === false) {
+                    die("Error executing the query for type: " . $conn->error);
+                }
+
+                // Inisialisasi array untuk menyimpan tipe untuk merek tertentu
+                $tipes = [];
+
+                // Loop untuk mengambil data tipe
+                while ($tipe = $result_tipe_per_merek->fetch_assoc()) {
+                    $tipes[] = $tipe['tipe'];
+                }
+
+                // Tambahkan merek dan tipe ke dalam struktur tipeData
+                $tipeData[$merek] = $tipes;
+            }
+            ?>
+
+            <form method="POST" action="../process/process-add-data-penjualan.php">
+                <div class="d-flex">
+                    <div class="mb-3">
+                        <label for="bulan" class="input-data-label">Bulan</label>
+                        <select class="form-select" aria-label="Default select example" name="bulan">
+                            <option selected>Pilih bulan</option>
+                            <?php while ($row = $result_bulan->fetch_assoc()) : ?>
+                                <?php
+                                // Konversi nilai bulan integer menjadi nama bulan
+                                $nama_bulan = date('F', mktime(0, 0, 0, $row['bulan'], 1));
+                                ?>
+                                <option value="<?php echo $row['bulan']; ?>"><?php echo $nama_bulan; ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 ms-5">
+                        <label for="tahun" class="input-data-label">Tahun</label>
+                        <select class="form-select" aria-label="Default select example" name="tahun">
+                            <option selected>Pilih tahun</option>
+                            <?php while ($row = $result_tahun->fetch_assoc()) : ?>
+                                <option value="<?php echo $row['tahun']; ?>"><?php echo $row['tahun']; ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mb-3 ms-5">
-                    <label for="tahun" class="input-data-label">Tahun</label>
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected>Pilih tahun</option>
-                        <option value="1">2021</option>
-                        <option value="2">2022</option>
-                        <option value="3">2023</option>
-                    </select>
-                </div>
-            </div>
+                <div class="d-flex">
+                    <div class="mb-3">
+                        <label for="merek" class="input-data-label">Merek</label>
+                        <select class="form-select" aria-label="Default select example" name="merek" id="merekSelect" onchange="updateTipeOptions()">
+                            <option selected>Pilih merek</option>
+                            <?php foreach ($merekOptions as $merek) : ?>
+                                <option value="<?php echo $merek; ?>"><?php echo $merek; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-            <div class="d-flex">
-                <div class="mb-3">
-                    <label for="merek" class="input-data-label">Merek</label>
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected>Pilih merek</option>
-                        <option value="1">Acer</option>
-                        <option value="2">Asus</option>
-                        <option value="3">Dell</option>
-                    </select>
+                    <div class="mb-3 ms-5">
+                        <label for="tipe" class="input-data-label">Tipe</label>
+                        <select class="form-select" aria-label="Default select example" name="tipe" id="tipeSelect">
+                            <option selected>Pilih tipe</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mb-3 ms-5">
-                    <label for="tipe" class="input-data-label">Tipe</label>
-                    <select class="form-select" aria-label="Default select example">
-                        <option selected>Pilih tipe</option>
-                        <option value="1">ASPIRE 3 A314</option>
-                        <option value="2">ASPIRE 3 A315</option>
-                        <option value="3">ASPIRE 5 A513</option>
-                    </select>
+                <div class="data-aktual">
+                    <label for="dt_aktual" class="input-data-label">Data Aktual</label>
+                    <input type="text" class="input-data-aktual" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required>
                 </div>
-            </div>
 
-            <div class="d-flex">
-                <a href="../view/data-penjualan.php" class="btn btn-success me-2">Simpan Data</a>
-                <a href="../view/data-penjualan.php" class="btn btn-secondary">Batal</a>
-            </div>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-success me-2" id="saveBtn">Simpan Data</button>
+                    <a href="../view/data-penjualan.php" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Bootstrap -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- Script Untuk Pengambilan Tipe Berdasarkan Merek -->
+    <script>
+        // Ambil elemen select merek dan tipe
+        const merekSelect = document.getElementById('merekSelect');
+        const tipeSelect = document.getElementById('tipeSelect');
+
+        // Definisikan data tipe untuk setiap merek dari PHP
+        const tipeData = <?php echo json_encode($tipeData); ?>;
+
+        // Fungsi untuk memperbarui opsi tipe berdasarkan merek yang dipilih
+        function updateTipeOptions() {
+            const selectedMerek = merekSelect.value;
+            const tipes = tipeData[selectedMerek] || [];
+
+            // Kosongkan opsi tipe sebelum memperbarui
+            tipeSelect.innerHTML = '<option selected>Pilih tipe</option>';
+
+            // Tambahkan opsi tipe sesuai dengan merek yang dipilih
+            tipes.forEach(tipe => {
+                const option = document.createElement('option');
+                option.value = tipe;
+                option.textContent = tipe;
+                tipeSelect.appendChild(option);
+            });
+        }
+
+        // Panggil fungsi untuk memperbarui opsi tipe saat halaman dimuat
+        updateTipeOptions();
+
+        // Tambahkan event listener untuk memperbarui opsi tipe saat merek dipilih
+        merekSelect.addEventListener('change', function() {
+            const selectedMerek = merekSelect.value;
+
+            // Buat objek XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+
+            // Atur callback untuk menangani respons dari server
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        // Respons dari server adalah data tipe dalam format JSON
+                        const tipes = JSON.parse(xhr.responseText);
+
+                        // Kosongkan opsi tipe sebelum memperbarui
+                        tipeSelect.innerHTML = '<option selected>Pilih tipe</option>';
+
+                        // Tambahkan opsi tipe sesuai dengan merek yang dipilih
+                        tipes.forEach(tipe => {
+                            const option = document.createElement('option');
+                            option.value = tipe;
+                            option.textContent = tipe;
+                            tipeSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Error fetching data:', xhr.statusText);
+                    }
+                }
+            };
+
+            // Atur jenis dan URL permintaan
+            xhr.open('POST', '../process/get_tipe.php', true);
+
+            // Atur header permintaan
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            // Kirim permintaan dengan merek yang dipilih sebagai data POST
+            xhr.send('merek=' + encodeURIComponent(selectedMerek));
+        });
+    </script>
+
+    <!-- SweetAlert2 script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            // Mendapatkan nilai input bulan, tahun, merek, tipe, dan data aktual
+            const bulanInput = document.querySelector('select[name="bulan"]').value;
+            const tahunInput = document.querySelector('select[name="tahun"]').value;
+            const merekInput = document.querySelector('select[name="merek"]').value;
+            const tipeInput = document.querySelector('select[name="tipe"]').value;
+            const dtAktualInput = document.getElementById('dt_aktual').value;
+
+            // Memeriksa apakah semua input sudah diisi
+            const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '';
+
+            if (isFormFilled) {
+                Swal.fire({
+                    title: "Apakah Anda ingin menyimpan data baru?",
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Simpan",
+                    denyButtonText: `Jangan Simpan`,
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: "Tersimpan!",
+                            text: "Data baru yang Anda buat sudah disimpan.",
+                            icon: "success",
+                            showConfirmButton: true,
+                            confirmButtonText: "OK"
+                        }).then(() => {
+                            // Submit formulir setelah menampilkan pesan tersimpan
+                            document.querySelector('form').submit();
+                        });
+                    } else if (result.isDenied) {
+                        Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
+                            window.history.back();
+                        });
+                    }
+                });
+            } else {
+                Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
+            }
+        });
+    </script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 
 </html>
