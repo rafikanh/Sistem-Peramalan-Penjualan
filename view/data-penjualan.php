@@ -43,6 +43,9 @@
                 $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%'";
             }
 
+            // Tambahkan klausa ORDER BY untuk mengurutkan berdasarkan bulan dan tahun
+            $sql .= " ORDER BY dp.tahun ASC, dp.bulan ASC";
+
             $result = $conn->query($sql);
 
             // Periksa keberhasilan eksekusi query
