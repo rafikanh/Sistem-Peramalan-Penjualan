@@ -34,13 +34,13 @@
             $search_query = isset($_POST['search_query']) ? $_POST['search_query'] : '';
 
             // Query SQL untuk mengambil data penjualan dengan informasi merek, tipe, bulan, dan tahun
-            $sql = "SELECT dp.id_penjualan, DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, db.merek, db.tipe, dp.dt_aktual 
+            $sql = "SELECT dp.id_penjualan, DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, db.merek, db.tipe, dp.dt_aktual, dp.admin 
             FROM dt_penjualan dp
             INNER JOIN dt_barang db ON dp.id_brg = db.id_brg";
 
             // Tambahkan filter berdasarkan kriteria pencarian jika ada
             if (!empty($search_query)) {
-                $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%'";
+                $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%' OR dp.admin LIKE '%$search_query%'";
             }
 
             // Tambahkan klausa ORDER BY untuk mengurutkan berdasarkan bulan dan tahun
@@ -63,6 +63,7 @@
                             <th scope="col">Merek</th>
                             <th scope="col">Tipe</th>
                             <th scope="col">Nilai Aktual</th>
+                            <th scope="col">Admin</th>
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>
@@ -73,8 +74,9 @@
                                 <td class="align-middle"><?php echo $row['merek']; ?></td>
                                 <td class="align-middle"><?php echo $row['tipe']; ?></td>
                                 <td class="align-middle"><?php echo $row['dt_aktual']; ?></td>
+                                <td class="align-middle"><?php echo $row['admin']; ?></td>
                                 <td class="d-flex">
-                                    <a href="../view/update-data-penjualan>" type="button" class="btn btn-warning me-2">
+                                    <a href="../view/update-data-penjualan.php" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <button type="button" class="btn btn-danger">
