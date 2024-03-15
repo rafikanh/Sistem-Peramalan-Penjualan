@@ -129,9 +129,16 @@
                     </div>
                 </div>
 
-                <div class="data-aktual">
-                    <label for="dt_aktual" class="input-data-label">Data Aktual</label>
-                    <input type="text" class="input-data-aktual" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required>
+                <div class="d-flex">
+                    <div class="data-aktual">
+                        <label for="dt_aktual" class="input-data-label">Data Aktual</label>
+                        <input type="text" class="input-data" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required>
+                    </div>
+
+                    <div class="mb-3 ms-5">
+                        <label for="admin" class="input-data-label">Admin</label>
+                        <input type="text" class="input-data" name="admin" id="admin" placeholder="Masukkan nama admin" required>
+                    </div>
                 </div>
 
                 <div class="d-flex">

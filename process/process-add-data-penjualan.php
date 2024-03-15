@@ -7,6 +7,7 @@ $tahun = $_POST['tahun'];
 $merek = $_POST['merek'];
 $tipe = $_POST['tipe'];
 $dt_aktual = $_POST['dt_aktual'];
+$admin = $_POST['admin'];
 
 // Lakukan operasi penyimpanan data ke dalam database
 $sql_get_id_brg = "SELECT id_brg FROM dt_barang WHERE merek = '$merek' AND tipe = '$tipe'";
@@ -18,8 +19,8 @@ if ($result_get_id_brg->num_rows > 0) {
     $id_brg = $row['id_brg'];
 
     // Query untuk menyimpan data ke dalam tabel dt_penjualan
-    $sql_insert_data_penjualan = "INSERT INTO dt_penjualan (bulan, tahun, id_brg, dt_aktual) 
-                                VALUES ('$bulan', '$tahun', '$id_brg', '$dt_aktual')";
+    $sql_insert_data_penjualan = "INSERT INTO dt_penjualan (bulan, tahun, id_brg, dt_aktual, admin) 
+                                VALUES ('$bulan', '$tahun', '$id_brg', '$dt_aktual', '$admin')";
 
     // Eksekusi query
     if ($conn->query($sql_insert_data_penjualan) === TRUE) {
