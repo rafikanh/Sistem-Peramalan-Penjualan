@@ -80,14 +80,6 @@ p {
   border-radius: 5px;
 }
 
-.input-data-aktual {
-  width: 750px;
-  padding: 6px 12px;
-  margin-bottom: 16px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-}
-
 .input-data-forecasting {
   width: 250px;
   padding: 6px 12px;
