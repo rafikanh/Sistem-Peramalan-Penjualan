@@ -230,9 +230,10 @@
             const merekInput = document.querySelector('select[name="merek"]').value;
             const tipeInput = document.querySelector('select[name="tipe"]').value;
             const dtAktualInput = document.getElementById('dt_aktual').value;
+            const adminInput = document.getElementById('admin').value;
 
             // Memeriksa apakah semua input sudah diisi
-            const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '';
+            const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '' && adminInput.trim() !== '';
 
             if (isFormFilled) {
                 Swal.fire({
