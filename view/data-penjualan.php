@@ -76,7 +76,7 @@
                                 <td class="align-middle"><?php echo $row['dt_aktual']; ?></td>
                                 <td class="align-middle"><?php echo $row['admin']; ?></td>
                                 <td class="d-flex">
-                                    <a href="../view/update-data-penjualan.php" type="button" class="btn btn-warning me-2">
+                                    <a href="../view/update-data-penjualan.php?id_penjualan=<?php echo $row['id_penjualan']; ?>" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <button type="button" class="btn btn-danger">
