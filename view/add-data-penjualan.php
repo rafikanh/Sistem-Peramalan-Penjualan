@@ -142,7 +142,7 @@
                 </div>
 
                 <div class="d-flex">
-                    <button type="button" class="btn btn-success me-2" id="saveBtn">Simpan Data</button>
+                    <button type="button" class="btn btn-custom me-2" id="saveBtn">Simpan Data</button>
                     <a href="../view/data-penjualan.php" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
