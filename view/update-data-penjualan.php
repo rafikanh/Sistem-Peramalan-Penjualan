@@ -245,7 +245,7 @@
 
                 if (isFormFilled) {
                     Swal.fire({
-                        title: "Apakah Anda ingin menyimpan data baru?",
+                        title: "Apakah Anda ingin menyimpan perubahan data?",
                         showDenyButton: true,
                         showCancelButton: true,
                         confirmButtonText: "Ya, Simpan",
@@ -255,7 +255,7 @@
                         if (result.isConfirmed) {
                             Swal.fire({
                                 title: "Tersimpan!",
-                                text: "Data baru yang Anda buat sudah disimpan.",
+                                text: "Perubahan yang Anda buat sudah disimpan.",
                                 icon: "success",
                                 showConfirmButton: true,
                                 confirmButtonText: "OK"
@@ -264,7 +264,7 @@
                                 document.querySelector('form').submit();
                             });
                         } else if (result.isDenied) {
-                            Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
+                            Swal.fire("Perubahan data tidak disimpan", "", "info").then(() => {
                                 window.history.back();
                             });
                         }
