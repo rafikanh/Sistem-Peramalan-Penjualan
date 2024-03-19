@@ -187,8 +187,8 @@
                         // Tambahkan opsi tipe sesuai dengan merek yang dipilih
                         tipes.forEach(tipe => {
                             const option = document.createElement('option');
-                            option.value = tipe;
-                            option.textContent = tipe;
+                            option.value = tipe['id_brg'];
+                            option.textContent = tipe['tipe'];
                             tipeSelect.appendChild(option);
                         });
                     } else {
@@ -240,7 +240,7 @@
             xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
             // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
-            xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&tipe=' + encodeURIComponent(selectedTipe));
+            xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
         });
 
         // Fungsi untuk memperbarui tabel dengan data penjualan

@@ -10,7 +10,7 @@ $dt_aktual = $_POST['dt_aktual'];
 $admin = $_POST['admin'];
 
 // Lakukan operasi penyimpanan data ke dalam database
-$sql_get_id_brg = "SELECT id_brg FROM dt_barang WHERE merek = '$merek' AND tipe = '$tipe'";
+$sql_get_id_brg = "SELECT id_brg FROM dt_barang WHERE merek = '$merek' AND id_brg = '$tipe'";
 $result_get_id_brg = $conn->query($sql_get_id_brg);
 
 if ($result_get_id_brg->num_rows > 0) {

@@ -2,19 +2,18 @@
 // Sertakan file koneksi ke database
 include '../koneksi.php';
 
-// Periksa apakah parameter merek dan tipe telah dikirim melalui metode POST
-if (isset($_POST['merek']) && isset($_POST['tipe'])) {
+// Periksa apakah parameter merek dan id_brg telah dikirim melalui metode POST
+if (isset($_POST['merek']) && isset($_POST['id_brg'])) {
     // Escape string untuk mencegah SQL injection
     $merek = $conn->real_escape_string($_POST['merek']);
-    $tipe = $conn->real_escape_string($_POST['tipe']);
+    $id_brg = $conn->real_escape_string($_POST['id_brg']);
 
-    // Query SQL untuk mengambil data penjualan berdasarkan merek dan tipe
+    // Query SQL untuk mengambil data penjualan berdasarkan merek dan id_brg
     $sql = "SELECT DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, dp.dt_aktual
         FROM dt_penjualan AS dp
         INNER JOIN dt_barang AS db ON dp.id_brg = db.id_brg
-        WHERE db.merek = '$merek' AND db.tipe = '$tipe'
+        WHERE db.merek = '$merek' AND db.id_brg = '$id_brg'
         ORDER BY dp.tahun, dp.bulan";
-
 
     // Lakukan query ke database
     $result = $conn->query($sql);
@@ -36,5 +35,6 @@ if (isset($_POST['merek']) && isset($_POST['tipe'])) {
     echo json_encode($dataPenjualan);
 } else {
     // Jika parameter tidak lengkap, kembalikan pesan error
-    echo "Error: Merek dan tipe tidak tersedia.";
+    echo "Error: Merek dan id_brg tidak tersedia.";
 }
+?>

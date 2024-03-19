@@ -137,22 +137,29 @@
                         <select id="tipeSelect" name="tipe" class="form-select" aria-label="Default select example">
                             <?php
                             // Ambil merek yang dipilih sebelumnya
-                            $merek_terpilih = isset($data_penjualan['merek']) ? $data_penjualan['merek'] : '';
+                            $tipe_terpilih = isset($data_penjualan['id_brg']) ? $data_penjualan['id_brg'] : '';
 
                             // Query SQL untuk mengambil data tipe yang terkait dengan merek yang dipilih
-                            $sql_merek_tipe = "SELECT DISTINCT tipe FROM dt_barang WHERE merek = '$merek_terpilih'";
-                            $result_merek_tipe = $conn->query($sql_merek_tipe);
+                            $sql_tipe = "SELECT DISTINCT * FROM dt_barang WHERE id_brg = '$tipe_terpilih'";
+                            $result_tipe = $conn->query($sql_tipe);
 
-                            // Periksa apakah query berhasil dieksekusi
-                            if ($result_merek_tipe) {
-                                // Loop untuk menampilkan data tipe
-                                while ($row = $result_merek_tipe->fetch_assoc()) {
-                                    $selected = isset($data_penjualan['tipe']) && $data_penjualan['tipe'] == $row['tipe'] ? 'selected' : '';
-                                    echo "<option value='" . $row['tipe'] . "' $selected>" . $row['tipe'] . "</option>";
-                                }
-                            } else {
-                                // Jika query gagal dieksekusi, tampilkan pesan kesalahan
-                                echo "Error: " . $sql_merek_tipe . "<br>" . $conn->error;
+                            // Buat array, nantinya digunakan untuk menyimpan data merek 
+                            $selected_merek = array();
+
+                            //Digunakan untuk mengambil data merek berdasarkan data yang dipilih
+                            while ($row = $result_tipe->fetch_assoc()) {
+                                $selected_merek[] = $row['merek'];
+                            }
+
+                            // SQL untuk mengambil semua data barang berdasarkan merek (merek sudah ditampung ke array variable merek)
+                            $sql_barangbymerek = "SELECT DISTINCT * FROM dt_barang WHERE merek = '$selected_merek[0]'";
+                            $sqltes = $conn->query($sql_barangbymerek);
+
+                            //Tampilkan data berdasarkan merek
+                            while ($row = $sqltes->fetch_assoc()) {
+                                //Cek dulu, apakah data yang tipe barang yang ditampilkan memiliki id sesuai dengan data yang dipilih
+                                $selected = isset($data_penjualan['id_brg']) && $data_penjualan['id_brg'] == $row['id_brg'] ? 'selected' : '';
+                                echo "<option value='" . $row['id_brg'] . "'$selected>" . $row['tipe'] . "</option>";
                             }
                             ?>
                         </select>
@@ -206,9 +213,10 @@
                             // Tambahkan opsi tipe baru
                             tipes.forEach(tipe => {
                                 const option = document.createElement('option');
-                                option.value = tipe;
-                                option.textContent = tipe;
+                                option.value = tipe['id_brg'];
+                                option.textContent = tipe['tipe'];
                                 tipeSelect.appendChild(option);
+                                option.selected = tipe['id_brg'] === '<?php echo isset($data_penjualan['id_brg']) && $data_penjualan['id_brg'] == $tipe['id_brg']; ?>';
                             });
                         } else {
                             console.error('Error fetching data:', xhr.statusText);

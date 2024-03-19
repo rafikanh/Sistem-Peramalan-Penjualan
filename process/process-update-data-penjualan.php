@@ -11,7 +11,7 @@ if (isset($_POST['id_penjualan'], $_POST['dt_aktual'], $_POST['admin'], $_POST['
     $tipe = $_POST['tipe'];
 
     // Dapatkan ID barang berdasarkan merek dan tipe yang dipilih
-    $sql_get_barang_id = "SELECT id_brg FROM dt_barang WHERE merek = '$merek' AND tipe = '$tipe'";
+    $sql_get_barang_id = "SELECT id_brg FROM dt_barang WHERE merek = '$merek' AND id_brg = '$tipe'";
     $result_get_barang_id = $conn->query($sql_get_barang_id);
 
     if ($result_get_barang_id && $result_get_barang_id->num_rows > 0) {

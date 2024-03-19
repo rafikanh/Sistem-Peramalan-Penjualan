@@ -198,8 +198,8 @@
                         // Tambahkan opsi tipe sesuai dengan merek yang dipilih
                         tipes.forEach(tipe => {
                             const option = document.createElement('option');
-                            option.value = tipe;
-                            option.textContent = tipe;
+                            option.value = tipe['id_brg'];
+                            option.textContent = tipe['tipe'];
                             tipeSelect.appendChild(option);
                         });
                     } else {

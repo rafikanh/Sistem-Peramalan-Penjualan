@@ -5,7 +5,7 @@ include '../koneksi.php';
 $merek = $_POST['merek'];
 
 // Query SQL untuk mengambil data tipe berdasarkan merek
-$sql = "SELECT DISTINCT tipe FROM dt_barang WHERE merek = '$merek'";
+$sql = "SELECT DISTINCT * FROM dt_barang WHERE merek = '$merek'";
 $result = $conn->query($sql);
 
 if ($result === false) {
@@ -17,7 +17,7 @@ $tipes = [];
 
 // Loop untuk mengambil data tipe
 while ($row = $result->fetch_assoc()) {
-    $tipes[] = $row['tipe'];
+    $tipes[] = $row;
 }
 
 // Mengembalikan data tipe dalam format JSON
