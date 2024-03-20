@@ -68,6 +68,12 @@ p {
   background-color: #ececec;
 }
 
+.scrollable-table {
+  overflow-y: scroll;
+  max-height: 400px;
+  background-color: #ececec;
+}
+
 .align-middle {
   vertical-align: middle !important;
 }
