@@ -81,13 +81,33 @@
                 // Tambahkan merek dan tipe ke dalam struktur tipeData
                 $tipeData[$merek] = $tipes;
             }
+
+            // Ambil tahun terakhir dari tabel dt_penjualan
+            $sql_latest_year = "SELECT MAX(tahun) AS latest_year FROM dt_penjualan";
+            $result_latest_year = $conn->query($sql_latest_year);
+
+            if ($result_latest_year === false) {
+                die("Error executing the query to get the latest year: " . $conn->error);
+            }
+
+            $latest_year_row = $result_latest_year->fetch_assoc();
+            $latest_year = $latest_year_row['latest_year'];
+
+            // Ambil tahun terbaru dari tabel dt_penjualan
+            $current_year = date('Y');
+
+            // Tambahkan satu tahun untuk mendapatkan tahun yang diinginkan
+            $desired_year = $current_year;
+            if ($latest_year >= $desired_year) {
+                $desired_year = $latest_year + 1;
+            }
             ?>
 
             <form method="POST" action="../process/process-add-data-penjualan.php">
                 <div class="d-flex">
                     <div class="mb-3">
                         <label for="bulan" class="input-data-label">Bulan</label>
-                        <select class="form-select" aria-label="Default select example" name="bulan">
+                        <select class="form-select" aria-label="Default select example" name="bulan" id="bulan">
                             <option selected>Pilih bulan</option>
                             <?php while ($row = $result_bulan->fetch_assoc()) : ?>
                                 <?php
@@ -101,18 +121,23 @@
 
                     <div class="mb-3 ms-5">
                         <label for="tahun" class="input-data-label">Tahun</label>
-                        <select class="form-select" aria-label="Default select example" name="tahun">
+                        <select class="form-select" aria-label="Default select example" name="tahun" id="tahun">
                             <option selected>Pilih tahun</option>
                             <?php while ($row = $result_tahun->fetch_assoc()) : ?>
                                 <option value="<?php echo $row['tahun']; ?>"><?php echo $row['tahun']; ?></option>
                             <?php endwhile; ?>
+                            <?php
+                            if ($latest_year < $desired_year) {
+                                echo "<option value='$desired_year'>$desired_year</option>";
+                            }
+                            ?>
                         </select>
                     </div>
                 </div>
 
                 <div class="d-flex">
                     <div class="mb-3">
-                        <label for="merek" class="input-data-label">Merek</label>
+                        <label for="merekSelect" class="input-data-label">Merek</label>
                         <select class="form-select" aria-label="Default select example" name="merek" id="merekSelect" onchange="updateTipeOptions()">
                             <option selected>Pilih merek</option>
                             <?php foreach ($merekOptions as $merek) : ?>
@@ -122,7 +147,7 @@
                     </div>
 
                     <div class="mb-3 ms-5">
-                        <label for="tipe" class="input-data-label">Tipe</label>
+                        <label for="tipeSelect" class="input-data-label">Tipe</label>
                         <select class="form-select" aria-label="Default select example" name="tipe" id="tipeSelect">
                             <option selected>Pilih tipe</option>
                         </select>
