@@ -171,3 +171,18 @@ select.form-select {
 .data-aktual {
   margin-bottom: 120px;
 }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 10px; 
+}
+
+.grid-item {
+  background-color: #E0F4FF;
+  padding: 6px 12px;
+  border: 1px solid #87C4FF; 
+  border-radius: 3px; 
+  width: 420px;
+  font-size: 16px;
+}

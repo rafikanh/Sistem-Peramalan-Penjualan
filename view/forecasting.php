@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-            <div class="scrollable-table-container">
+            <div class="scrollable-table-container mb-3">
                 <table class="table">
                     <thead>
                         <tr>
@@ -133,8 +133,10 @@
                 </table>
             </div>
 
-            <h4>Peramalan bulan berikutnya ....</h4>
-            <h4>MAPE ....%</h4>
+            <div class="grid">
+                <div class="grid-item">Peramalan bulan berikutnya...</div>
+                <div class="grid-item">MAPE...%</div>
+            </div>
         </div>
     </div>
 
