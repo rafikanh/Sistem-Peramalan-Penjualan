@@ -1,3 +1,33 @@
+<?php
+// Sertakan file konfigurasi database
+require_once "koneksi.php";
+
+// Cek apakah form login disubmit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Mengambil nilai dari form login
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Menggunakan fungsi md5 untuk hash password
+    $hashedPassword = md5($password);
+
+    // Query untuk memeriksa apakah username dan password valid
+    $sql = "SELECT * FROM users WHERE email='$email' AND password='$hashedPassword'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // Login berhasil
+        session_start();
+        $_SESSION['email'] = $email;
+        header("Location: view/dashboard.php"); // Ganti dashboard.php dengan halaman setelah login
+        exit(); // Pastikan untuk keluar dari skrip setelah melakukan pengalihan
+    } else {
+        // Login gagal, tampilkan pesan kesalahan
+        $errorMessage = "Email atau password salah. Mohon periksa kembali.";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,7 +54,14 @@
 
                             <h3 class="mb-4"><b>LOGIN</b></h3>
 
-                            <form id="loginForm" action="./process/login_proses.php" method="POST">
+                            <!-- Tampilkan pesan kesalahan jika login gagal -->
+                            <?php if(isset($errorMessage)): ?>
+                                <div class="alert alert-danger" role="alert">
+                                    <?php echo $errorMessage; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <form id="loginForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control" id="email" name="email" autocomplete="email" placeholder="Masukkan email" aria-describedby="emailHelp" required>
