@@ -28,7 +28,7 @@
                     <input type="text" class="input-data-forecasting" id="alpha" placeholder="Masukkan nilai alpha">
                 </div>
                 <div class="mb-1 ms-2">
-                    <button class="btn btn-custom custom-button">
+                    <button class="btn btn-custom custom-button" id="alphaButton">
                         <i class="bi bi-pen"></i>
                     </button>
                 </div>
@@ -41,7 +41,7 @@
                     <input type="text" class="input-data-forecasting" id="beta" placeholder="Masukkan nilai beta">
                 </div>
                 <div class="mb-3 ms-2">
-                    <button class="btn btn-custom custom-button">
+                    <button class="btn btn-custom custom-button" id="betaButton">
                         <i class="bi bi-pen"></i>
                     </button>
                 </div>
@@ -96,7 +96,7 @@
 
             <div class="d-flex">
                 <div class="mb-3">
-                    <label for="merek" class="input-data-label">Merek</label>
+                    <label for="merekSelect" class="input-data-label">Merek</label>
                     <select class="form-select" aria-label="Default select example" name="merek" id="merekSelect" onchange="updateTipeOptions()">
                         <option selected>Pilih merek</option>
                         <?php foreach ($merekOptions as $merek) : ?>
@@ -106,10 +106,14 @@
                 </div>
 
                 <div class="mb-3 ms-5">
-                    <label for="tipe" class="input-data-label">Tipe</label>
+                    <label for="tipeSelect" class="input-data-label">Tipe</label>
                     <select class="form-select" aria-label="Default select example" name="tipe" id="tipeSelect">
                         <option selected>Pilih tipe</option>
                     </select>
+                </div>
+
+                <div class="button-count">
+                    <button id="hitungButton" class="btn btn-custom custom-button">Hitung</button>
                 </div>
             </div>
 
@@ -212,59 +216,207 @@
 
     <!-- Script Untuk Pengambilan Data Bulan Tahun dan Data Aktual Berdasarkan Tipe -->
     <script>
-        // Tambahkan event listener untuk memperbarui tabel saat tipe dipilih
-        tipeSelect.addEventListener('change', function() {
-            const selectedMerek = merekSelect.value;
-            const selectedTipe = tipeSelect.value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttonHitung = document.getElementById('hitungButton');
+            // Tambahkan event listener untuk memperbarui tabel saat tombol hitung diklik
+            buttonHitung.addEventListener('click', function() {
+                const selectedMerek = merekSelect.value;
+                const selectedTipe = tipeSelect.value;
 
-            // Buat objek XMLHttpRequest
-            const xhr = new XMLHttpRequest();
+                // Buat objek XMLHttpRequest
+                const xhr = new XMLHttpRequest();
 
-            // Atur callback untuk menangani respons dari server
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        // Respons dari server adalah data penjualan dalam format JSON
-                        const dataPenjualan = JSON.parse(xhr.responseText);
+                // Atur callback untuk menangani respons dari server
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            // Respons dari server adalah data penjualan dalam format JSON
+                            const dataPenjualan = JSON.parse(xhr.responseText);
 
-                        // Perbarui tabel dengan data yang diterima
-                        updateTable(dataPenjualan);
-                    } else {
-                        console.error('Error fetching data:', xhr.statusText);
+                            // Perbarui tabel dengan data yang diterima
+                            updateTable(dataPenjualan);
+                        } else {
+                            console.error('Error fetching data:', xhr.statusText);
+                        }
                     }
-                }
-            };
+                };
 
-            // Atur jenis dan URL permintaan
-            xhr.open('POST', '../process/get_penjualan.php', true);
+                // Atur jenis dan URL permintaan
+                xhr.open('POST', '../process/get_penjualan.php', true);
 
-            // Atur header permintaan
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                // Atur header permintaan
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-            // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
-            xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
+                // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
+                xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
+            });
+
+            // Fungsi untuk memperbarui tabel dengan data penjualan
+            function updateTable(dataPenjualan) {
+                // Dapatkan elemen tbody dari tabel
+                const tbody = document.querySelector('.table tbody');
+
+                // Kosongkan isi tbody sebelum memperbarui
+                tbody.innerHTML = '';
+
+                // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
+                dataPenjualan.forEach(function(rowData) {
+                    const row = document.createElement('tr');
+
+                    // Loop melalui setiap kolom data dan tambahkan ke dalam baris
+                    Object.values(rowData).forEach(function(value) {
+                        const cell = document.createElement('td');
+                        cell.textContent = value;
+                        row.appendChild(cell);
+                    });
+
+                    tbody.appendChild(row);
+                });
+            }
+        });
+    </script>
+
+    <!-- Perhitungan Double Exponential Smoothing -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttonAlpha = document.querySelector('#alphaButton');
+            const buttonBeta = document.querySelector('#betaButton');
+            const buttonHitung = document.querySelector('#hitungButton');
+
+            buttonAlpha.addEventListener('click', function() {
+                const alphaInput = document.querySelector('#alpha').value;
+                localStorage.setItem('alpha', alphaInput);
+                alert('Nilai alpha telah disimpan: ' + alphaInput);
+            });
+
+            buttonBeta.addEventListener('click', function() {
+                const betaInput = document.querySelector('#beta').value;
+                localStorage.setItem('beta', betaInput);
+                alert('Nilai beta telah disimpan: ' + betaInput);
+            });
+
+            // Pastikan buttonHitung tidak null sebelum menambahkan event listener
+            if (buttonHitung) {
+                buttonHitung.addEventListener('click', function() {
+                    const alpha = parseFloat(localStorage.getItem('alpha'));
+                    const beta = parseFloat(localStorage.getItem('beta'));
+                    if (isNaN(alpha) || isNaN(beta)) {
+                        alert('Harap masukkan nilai alpha dan beta terlebih dahulu.');
+                        return;
+                    }
+
+                    const selectedMerek = merekSelect.value;
+                    const selectedTipe = tipeSelect.value;
+
+                    if (selectedMerek === 'Pilih merek' || selectedTipe === 'Pilih tipe') {
+                        alert('Harap pilih merek dan tipe terlebih dahulu.');
+                        return;
+                    }
+
+                    const xhr = new XMLHttpRequest(); // Inisialisasi XMLHttpRequest di sini
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status === 200) {
+                                const dataPenjualan = JSON.parse(xhr.responseText);
+                                if (dataPenjualan.length === 0) {
+                                    alert('Data penjualan tidak tersedia untuk merek dan tipe yang dipilih.');
+                                    return;
+                                }
+
+                                const smoothedData = calculateDoubleExponentialSmoothing(dataPenjualan, alpha, beta);
+                                updateTableWithSmoothedData(smoothedData);
+                            } else {
+                                console.error('Error fetching data:', xhr.statusText);
+                            }
+                        }
+                    };
+                    xhr.open('POST', '../process/get_penjualan.php', true);
+                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
+                });
+            }
         });
 
-        // Fungsi untuk memperbarui tabel dengan data penjualan
-        function updateTable(dataPenjualan) {
-            // Dapatkan elemen tbody dari tabel
+        // Fungsi untuk melakukan perhitungan Double Exponential Smoothing
+        function calculateDoubleExponentialSmoothing(data, alpha, beta) {
+            const actualData = data.map(row => row.value); // Ambil nilai penjualan dari data
+
+            // Inisialisasi level dan trend awal
+            let level = actualData[0];
+            let trend = actualData[1] - actualData[0];
+            let smoothedData = [];
+
+            // Perhitungan Double Exponential Smoothing
+            for (let i = 1; i < actualData.length; i++) {
+                const value = actualData[i];
+                const lastLevel = level;
+                level = alpha * value + (1 - alpha) * (level + trend);
+                trend = beta * (level - lastLevel) + (1 - beta) * trend;
+
+                // Hitung nilai peramalan, error, absolute error, dan percentage error
+                const forecast = level + trend;
+                const error = value - forecast;
+                const absError = Math.abs(error);
+                const percentageError = (absError / value) * 100;
+
+                // Simpan hasil perhitungan
+                smoothedData.push({
+                    actual: value,
+                    level: level,
+                    trend: trend,
+                    forecast: forecast,
+                    error: error,
+                    absError: absError,
+                    percentageError: percentageError
+                });
+            }
+
+            return smoothedData;
+        }
+
+        // Fungsi untuk memperbarui tabel dengan hasil perhitungan Double Exponential Smoothing
+        function updateTableWithSmoothedData(data) {
+            // Dapatkan referensi ke elemen tbody dari tabel
             const tbody = document.querySelector('.table tbody');
 
             // Kosongkan isi tbody sebelum memperbarui
             tbody.innerHTML = '';
 
-            // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
-            dataPenjualan.forEach(function(rowData) {
-                const row = document.createElement('tr');
+            // Loop melalui data hasil perhitungan dan tambahkan baris baru ke dalam tbody
+            data.forEach((row, index) => {
+                const newRow = tbody.insertRow(); // Sisipkan baris baru ke dalam tbody
 
-                // Loop melalui setiap kolom data dan tambahkan ke dalam baris
-                Object.values(rowData).forEach(function(value) {
-                    const cell = document.createElement('td');
-                    cell.textContent = value;
-                    row.appendChild(cell);
-                });
+                // Tambahkan sel untuk bulan tahun
+                const monthYearCell = newRow.insertCell();
+                monthYearCell.textContent = row.monthYear;
 
-                tbody.appendChild(row);
+                // Tambahkan sel untuk nilai aktual
+                const actualCell = newRow.insertCell();
+                actualCell.textContent = row.actual;
+
+                // Tambahkan sel untuk nilai level
+                const levelCell = newRow.insertCell();
+                levelCell.textContent = row.level;
+
+                // Tambahkan sel untuk nilai trend
+                const trendCell = newRow.insertCell();
+                trendCell.textContent = row.trend;
+
+                // Tambahkan sel untuk nilai peramalan
+                const forecastCell = newRow.insertCell();
+                forecastCell.textContent = row.forecast;
+
+                // Tambahkan sel untuk nilai error
+                const errorCell = newRow.insertCell();
+                errorCell.textContent = row.error;
+
+                // Tambahkan sel untuk nilai absolute error
+                const absErrorCell = newRow.insertCell();
+                absErrorCell.textContent = row.absError;
+
+                // Tambahkan sel untuk nilai percentage error
+                const percentageErrorCell = newRow.insertCell();
+                percentageErrorCell.textContent = row.percentageError + '%';
             });
         }
     </script>
