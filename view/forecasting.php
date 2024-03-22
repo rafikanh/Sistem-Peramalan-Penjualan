@@ -94,6 +94,103 @@
             }
             ?>
 
+<?php
+            // Inisialisasi variabel alpha dan beta tanpa nilai default
+            $alpha = null;
+            $beta = null;
+
+            // Perbarui nilai alpha dan beta jika ada data yang dikirimkan
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                if (isset($_POST['alpha']) && isset($_POST['beta'])) {
+                    $alpha = $_POST['alpha'];
+                    $beta = $_POST['beta'];
+                }
+            }
+
+            // Fungsi untuk mengambil data penjualan dari database berdasarkan merek dan id barang yang dipilih
+            function getDataPenjualan($selectedMerek, $selectedTipe)
+            {
+                // Sertakan file koneksi ke database
+                include '../koneksi.php';
+
+                // Escape string untuk mencegah SQL injection
+                $merek = isset($selectedMerek) ? $conn->real_escape_string($selectedMerek) : '';
+                $id_brg = isset($selectedTipe) ? $conn->real_escape_string($selectedTipe) : '';
+
+                // Query SQL untuk mengambil data penjualan berdasarkan merek dan id_brg
+                $sql = "SELECT DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, dp.dt_aktual
+                FROM dt_penjualan AS dp
+                INNER JOIN dt_barang AS db ON dp.id_brg = db.id_brg
+                WHERE db.merek = '$merek' AND db.id_brg = '$id_brg'
+                ORDER BY dp.tahun, dp.bulan";
+
+                // Lakukan query ke database
+                $result = $conn->query($sql);
+
+                // Periksa apakah query berhasil dieksekusi
+                if ($result === false) {
+                    die("Error executing the query: " . $conn->error);
+                }
+
+                // Inisialisasi array untuk menyimpan data penjualan
+                $dataPenjualan = [];
+
+                // Loop untuk menyimpan setiap baris data penjualan dalam array
+                while ($row = $result->fetch_assoc()) {
+                    $dataPenjualan[] = $row;
+                }
+
+                // Kembalikan data penjualan dalam format JSON
+                return $dataPenjualan;
+            }
+
+            // Ambil data penjualan berdasarkan tipe yang dipilih
+            $selectedMerek = $_POST['merek'] ?? null;
+            $selectedTipe = $_POST['id_brg'] ?? null;
+            $dataPenjualan = getDataPenjualan($selectedMerek, $selectedTipe);
+
+            // Inisialisasi variabel alpha dan beta tanpa nilai default
+            $alpha = isset($_POST['alpha']) ? $_POST['alpha'] : (isset($_COOKIE['alpha']) ? $_COOKIE['alpha'] : null);
+            $beta = isset($_POST['beta']) ? $_POST['beta'] : (isset($_COOKIE['beta']) ? $_COOKIE['beta'] : null);
+
+            // Inisialisasi array untuk menyimpan hasil perhitungan DES
+            $forecasts = [];
+
+            foreach ($dataPenjualan as $index => $item) {
+                // Ambil nilai data aktual
+                $actual = $item["dt_aktual"];
+
+                // Hitung level dan trend
+                $level = ($index == 0) ? $actual : $alpha * $actual + (1 - $alpha) * ($forecasts[$index - 1]["Level"] + $forecasts[$index - 1]["Trend"]);
+                $trend = ($index == 0) ? 0 : $beta * ($level - $forecasts[$index - 1]["Level"]) + (1 - $beta) * $forecasts[$index - 1]["Trend"];
+
+                // Hitung forecast DES
+                $forecast = $level + $trend;
+
+                // Hitung error
+                $error = $actual - $forecast;
+
+                // Hitung absolute error
+                $absError = abs($error);
+
+                // Hitung percentage error (menghindari pembagian oleh nol)
+                $percentError = ($actual != 0) ? ($error / $actual) * 100 : 0;
+
+                // Simpan hasil perhitungan
+                $forecasts[] = [
+                    "Level" => $level,
+                    "Trend" => $trend,
+                    "Forecast" => $forecast,
+                    "Error" => $error,
+                    "Abs Error" => $absError,
+                    "% Error" => $percentError,
+                ];
+            }
+
+            // Kembalikan hasil perhitungan dalam format JSON
+            echo json_encode($forecasts);
+            ?>
+
             <div class="d-flex">
                 <div class="mb-3">
                     <label for="merekSelect" class="input-data-label">Merek</label>
@@ -216,9 +313,11 @@
 
     <!-- Script Untuk Pengambilan Data Bulan Tahun dan Data Aktual Berdasarkan Tipe -->
     <script>
+        // Script untuk menyimpan nilai alpha dan beta
         document.addEventListener('DOMContentLoaded', function() {
             const buttonHitung = document.getElementById('hitungButton');
-            // Tambahkan event listener untuk memperbarui tabel saat tombol hitung diklik
+
+            // Tambahkan event listener untuk tombol "Hitung"
             buttonHitung.addEventListener('click', function() {
                 const selectedMerek = merekSelect.value;
                 const selectedTipe = tipeSelect.value;
@@ -233,8 +332,11 @@
                             // Respons dari server adalah data penjualan dalam format JSON
                             const dataPenjualan = JSON.parse(xhr.responseText);
 
+                            // Lakukan perhitungan DES di sini dan simpan hasilnya dalam variabel
+                            const forecasts = <?php echo json_encode($forecasts); ?>;
+
                             // Perbarui tabel dengan data yang diterima
-                            updateTable(dataPenjualan);
+                            updateTable(dataPenjualan, forecasts);
                         } else {
                             console.error('Error fetching data:', xhr.statusText);
                         }
@@ -251,8 +353,8 @@
                 xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
             });
 
-            // Fungsi untuk memperbarui tabel dengan data penjualan
-            function updateTable(dataPenjualan) {
+            // Fungsi untuk memperbarui tabel dengan data penjualan dan hasil perhitungan DES
+            function updateTable(dataPenjualan, forecasts) {
                 // Dapatkan elemen tbody dari tabel
                 const tbody = document.querySelector('.table tbody');
 
@@ -260,7 +362,7 @@
                 tbody.innerHTML = '';
 
                 // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
-                dataPenjualan.forEach(function(rowData) {
+                dataPenjualan.forEach(function(rowData, index) {
                     const row = document.createElement('tr');
 
                     // Loop melalui setiap kolom data dan tambahkan ke dalam baris
@@ -270,156 +372,89 @@
                         row.appendChild(cell);
                     });
 
+                    // Tambahkan nilai Level, Trend, dan Forecast dari array forecasts ke dalam baris
+                    const levelCell = document.createElement('td');
+                    const trendCell = document.createElement('td');
+                    const forecastCell = document.createElement('td');
+                    const errorCell = document.createElement('td');
+                    const abserrorCell = document.createElement('td');
+                    const percentageerrorCell = document.createElement('td');
+
+                    // Pastikan indeks `index` tidak melebihi panjang array `forecasts`
+                    if (index < forecasts.length) {
+                        levelCell.textContent = forecasts[index]['Level'];
+                        trendCell.textContent = forecasts[index]['Trend'];
+                        forecastCell.textContent = forecasts[index]['Forecast'];
+                        errorCell.textContent = forecasts[index]['Error'];
+                        abserrorCell.textContent = forecasts[index]['Abs Error'];
+                        percentageerrorCell.textContent = forecasts[index]['% Error'];
+                    } else {
+                        levelCell.textContent = 'N/A';
+                        trendCell.textContent = 'N/A';
+                        forecastCell.textContent = 'N/A';
+                        errorCell.textContent = 'N/A';
+                        abserrorCell.textContent = 'N/A';
+                        percentageerrorCell.textContent = 'N/A';
+                    }
+
+                    row.appendChild(levelCell);
+                    row.appendChild(trendCell);
+                    row.appendChild(forecastCell);
+                    row.appendChild(errorCell);
+                    row.appendChild(abserrorCell);
+                    row.appendChild(percentageerrorCell);
+
                     tbody.appendChild(row);
                 });
             }
         });
     </script>
 
-    <!-- Perhitungan Double Exponential Smoothing -->
+    <!-- Script untuk menyimpan nilai alpha dan beta -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const buttonAlpha = document.querySelector('#alphaButton');
-            const buttonBeta = document.querySelector('#betaButton');
-            const buttonHitung = document.querySelector('#hitungButton');
+            // Ambil elemen tombol "Pen" untuk alpha dan beta
+            const buttonAlpha = document.getElementById('alphaButton');
+            const buttonBeta = document.getElementById('betaButton');
 
+            // Tambahkan event listener untuk tombol "Pen" alpha
             buttonAlpha.addEventListener('click', function() {
-                const alphaInput = document.querySelector('#alpha').value;
-                localStorage.setItem('alpha', alphaInput);
-                alert('Nilai alpha telah disimpan: ' + alphaInput);
+                // Ambil nilai alpha dari input
+                const alphaInput = parseFloat(document.getElementById('alpha').value);
+
+                // Periksa apakah nilai alpha berada dalam rentang yang diizinkan (0.1 - 0.9)
+                if (alphaInput >= 0.1 && alphaInput <= 0.9) {
+                    // Simpan nilai alpha ke dalam localStorage dengan kunci "alpha"
+                    localStorage.setItem('alpha', alphaInput);
+
+                    // Beri notifikasi bahwa nilai alpha telah disimpan
+                    alert('Nilai alpha telah disimpan: ' + alphaInput);
+                } else {
+                    // Tampilkan alert jika nilai alpha tidak berada dalam rentang yang diizinkan
+                    alert('Nilai alpha harus berada dalam rentang 0.1 sampai 0.9');
+                }
             });
 
+            // Tambahkan event listener untuk tombol "Pen" beta
             buttonBeta.addEventListener('click', function() {
-                const betaInput = document.querySelector('#beta').value;
-                localStorage.setItem('beta', betaInput);
-                alert('Nilai beta telah disimpan: ' + betaInput);
+                // Ambil nilai beta dari input
+                const betaInput = parseFloat(document.getElementById('beta').value);
+
+                // Periksa apakah nilai beta berada dalam rentang yang diizinkan (0.1 - 0.9)
+                if (betaInput >= 0.1 && betaInput <= 0.9) {
+                    // Simpan nilai beta ke dalam localStorage dengan kunci "beta"
+                    localStorage.setItem('beta', betaInput);
+
+                    // Beri notifikasi bahwa nilai beta telah disimpan
+                    alert('Nilai beta telah disimpan: ' + betaInput);
+                } else {
+                    // Tampilkan alert jika nilai beta tidak berada dalam rentang yang diizinkan
+                    alert('Nilai beta harus berada dalam rentang 0.1 sampai 0.9');
+                }
             });
-
-            // Pastikan buttonHitung tidak null sebelum menambahkan event listener
-            if (buttonHitung) {
-                buttonHitung.addEventListener('click', function() {
-                    const alpha = parseFloat(localStorage.getItem('alpha'));
-                    const beta = parseFloat(localStorage.getItem('beta'));
-                    if (isNaN(alpha) || isNaN(beta)) {
-                        alert('Harap masukkan nilai alpha dan beta terlebih dahulu.');
-                        return;
-                    }
-
-                    const selectedMerek = merekSelect.value;
-                    const selectedTipe = tipeSelect.value;
-
-                    if (selectedMerek === 'Pilih merek' || selectedTipe === 'Pilih tipe') {
-                        alert('Harap pilih merek dan tipe terlebih dahulu.');
-                        return;
-                    }
-
-                    const xhr = new XMLHttpRequest(); // Inisialisasi XMLHttpRequest di sini
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === XMLHttpRequest.DONE) {
-                            if (xhr.status === 200) {
-                                const dataPenjualan = JSON.parse(xhr.responseText);
-                                if (dataPenjualan.length === 0) {
-                                    alert('Data penjualan tidak tersedia untuk merek dan tipe yang dipilih.');
-                                    return;
-                                }
-
-                                const smoothedData = calculateDoubleExponentialSmoothing(dataPenjualan, alpha, beta);
-                                updateTableWithSmoothedData(smoothedData);
-                            } else {
-                                console.error('Error fetching data:', xhr.statusText);
-                            }
-                        }
-                    };
-                    xhr.open('POST', '../process/get_penjualan.php', true);
-                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                    xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
-                });
-            }
         });
-
-        // Fungsi untuk melakukan perhitungan Double Exponential Smoothing
-        function calculateDoubleExponentialSmoothing(data, alpha, beta) {
-            const actualData = data.map(row => row.value); // Ambil nilai penjualan dari data
-
-            // Inisialisasi level dan trend awal
-            let level = actualData[0];
-            let trend = actualData[1] - actualData[0];
-            let smoothedData = [];
-
-            // Perhitungan Double Exponential Smoothing
-            for (let i = 1; i < actualData.length; i++) {
-                const value = actualData[i];
-                const lastLevel = level;
-                level = alpha * value + (1 - alpha) * (level + trend);
-                trend = beta * (level - lastLevel) + (1 - beta) * trend;
-
-                // Hitung nilai peramalan, error, absolute error, dan percentage error
-                const forecast = level + trend;
-                const error = value - forecast;
-                const absError = Math.abs(error);
-                const percentageError = (absError / value) * 100;
-
-                // Simpan hasil perhitungan
-                smoothedData.push({
-                    actual: value,
-                    level: level,
-                    trend: trend,
-                    forecast: forecast,
-                    error: error,
-                    absError: absError,
-                    percentageError: percentageError
-                });
-            }
-
-            return smoothedData;
-        }
-
-        // Fungsi untuk memperbarui tabel dengan hasil perhitungan Double Exponential Smoothing
-        function updateTableWithSmoothedData(data) {
-            // Dapatkan referensi ke elemen tbody dari tabel
-            const tbody = document.querySelector('.table tbody');
-
-            // Kosongkan isi tbody sebelum memperbarui
-            tbody.innerHTML = '';
-
-            // Loop melalui data hasil perhitungan dan tambahkan baris baru ke dalam tbody
-            data.forEach((row, index) => {
-                const newRow = tbody.insertRow(); // Sisipkan baris baru ke dalam tbody
-
-                // Tambahkan sel untuk bulan tahun
-                const monthYearCell = newRow.insertCell();
-                monthYearCell.textContent = row.monthYear;
-
-                // Tambahkan sel untuk nilai aktual
-                const actualCell = newRow.insertCell();
-                actualCell.textContent = row.actual;
-
-                // Tambahkan sel untuk nilai level
-                const levelCell = newRow.insertCell();
-                levelCell.textContent = row.level;
-
-                // Tambahkan sel untuk nilai trend
-                const trendCell = newRow.insertCell();
-                trendCell.textContent = row.trend;
-
-                // Tambahkan sel untuk nilai peramalan
-                const forecastCell = newRow.insertCell();
-                forecastCell.textContent = row.forecast;
-
-                // Tambahkan sel untuk nilai error
-                const errorCell = newRow.insertCell();
-                errorCell.textContent = row.error;
-
-                // Tambahkan sel untuk nilai absolute error
-                const absErrorCell = newRow.insertCell();
-                absErrorCell.textContent = row.absError;
-
-                // Tambahkan sel untuk nilai percentage error
-                const percentageErrorCell = newRow.insertCell();
-                percentageErrorCell.textContent = row.percentageError + '%';
-            });
-        }
     </script>
+
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
