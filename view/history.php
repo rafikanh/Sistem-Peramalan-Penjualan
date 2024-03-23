@@ -24,6 +24,8 @@
                     <thead>
                         <tr>
                             <th scope="col">Bulan Tahun</th>
+                            <th scope="col">Merek</th>
+                            <th scope="col">Tipe</th>
                             <th scope="col">Nilai Peramalan</th>
                         </tr>
                     </thead>
@@ -33,6 +35,8 @@
                             for ($i = 0; $i < 20; $i++) {
                                 echo "<tr>";
                                 echo "<td>Januari 2024</td>";
+                                echo "<td></td>";
+                                echo "<td></td>";
                                 echo "<td>25</td>";
                                 echo "</tr>";
                             }
