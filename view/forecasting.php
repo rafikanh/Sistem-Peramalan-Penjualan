@@ -94,102 +94,7 @@
             }
             ?>
 
-<?php
-            // Inisialisasi variabel alpha dan beta tanpa nilai default
-            $alpha = null;
-            $beta = null;
 
-            // Perbarui nilai alpha dan beta jika ada data yang dikirimkan
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                if (isset($_POST['alpha']) && isset($_POST['beta'])) {
-                    $alpha = $_POST['alpha'];
-                    $beta = $_POST['beta'];
-                }
-            }
-
-            // Fungsi untuk mengambil data penjualan dari database berdasarkan merek dan id barang yang dipilih
-            function getDataPenjualan($selectedMerek, $selectedTipe)
-            {
-                // Sertakan file koneksi ke database
-                include '../koneksi.php';
-
-                // Escape string untuk mencegah SQL injection
-                $merek = isset($selectedMerek) ? $conn->real_escape_string($selectedMerek) : '';
-                $id_brg = isset($selectedTipe) ? $conn->real_escape_string($selectedTipe) : '';
-
-                // Query SQL untuk mengambil data penjualan berdasarkan merek dan id_brg
-                $sql = "SELECT DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, dp.dt_aktual
-                FROM dt_penjualan AS dp
-                INNER JOIN dt_barang AS db ON dp.id_brg = db.id_brg
-                WHERE db.merek = '$merek' AND db.id_brg = '$id_brg'
-                ORDER BY dp.tahun, dp.bulan";
-
-                // Lakukan query ke database
-                $result = $conn->query($sql);
-
-                // Periksa apakah query berhasil dieksekusi
-                if ($result === false) {
-                    die("Error executing the query: " . $conn->error);
-                }
-
-                // Inisialisasi array untuk menyimpan data penjualan
-                $dataPenjualan = [];
-
-                // Loop untuk menyimpan setiap baris data penjualan dalam array
-                while ($row = $result->fetch_assoc()) {
-                    $dataPenjualan[] = $row;
-                }
-
-                // Kembalikan data penjualan dalam format JSON
-                return $dataPenjualan;
-            }
-
-            // Ambil data penjualan berdasarkan tipe yang dipilih
-            $selectedMerek = $_POST['merek'] ?? null;
-            $selectedTipe = $_POST['id_brg'] ?? null;
-            $dataPenjualan = getDataPenjualan($selectedMerek, $selectedTipe);
-
-            // Inisialisasi variabel alpha dan beta tanpa nilai default
-            $alpha = isset($_POST['alpha']) ? $_POST['alpha'] : (isset($_COOKIE['alpha']) ? $_COOKIE['alpha'] : null);
-            $beta = isset($_POST['beta']) ? $_POST['beta'] : (isset($_COOKIE['beta']) ? $_COOKIE['beta'] : null);
-
-            // Inisialisasi array untuk menyimpan hasil perhitungan DES
-            $forecasts = [];
-
-            foreach ($dataPenjualan as $index => $item) {
-                // Ambil nilai data aktual
-                $actual = $item["dt_aktual"];
-
-                // Hitung level dan trend
-                $level = ($index == 0) ? $actual : $alpha * $actual + (1 - $alpha) * ($forecasts[$index - 1]["Level"] + $forecasts[$index - 1]["Trend"]);
-                $trend = ($index == 0) ? 0 : $beta * ($level - $forecasts[$index - 1]["Level"]) + (1 - $beta) * $forecasts[$index - 1]["Trend"];
-
-                // Hitung forecast DES
-                $forecast = $level + $trend;
-
-                // Hitung error
-                $error = $actual - $forecast;
-
-                // Hitung absolute error
-                $absError = abs($error);
-
-                // Hitung percentage error (menghindari pembagian oleh nol)
-                $percentError = ($actual != 0) ? ($error / $actual) * 100 : 0;
-
-                // Simpan hasil perhitungan
-                $forecasts[] = [
-                    "Level" => $level,
-                    "Trend" => $trend,
-                    "Forecast" => $forecast,
-                    "Error" => $error,
-                    "Abs Error" => $absError,
-                    "% Error" => $percentError,
-                ];
-            }
-
-            // Kembalikan hasil perhitungan dalam format JSON
-            echo json_encode($forecasts);
-            ?>
 
             <div class="d-flex">
                 <div class="mb-3">
@@ -267,8 +172,18 @@
             });
         }
 
+        function getAlphaBeta() {
+            const alpha = localStorage.getItem('alpha');
+            const beta = localStorage.getItem('beta')
+
+            document.getElementById('alpha').value = alpha;
+            document.getElementById('beta').value = beta;
+        }
+
         // Panggil fungsi untuk memperbarui opsi tipe saat halaman dimuat
         updateTipeOptions();
+
+        getAlphaBeta();
 
         // Tambahkan event listener untuk memperbarui opsi tipe saat merek dipilih
         merekSelect.addEventListener('change', function() {
@@ -326,17 +241,15 @@
                 const xhr = new XMLHttpRequest();
 
                 // Atur callback untuk menangani respons dari server
-                xhr.onreadystatechange = function() {
+                xhr.onreadystatechange = async function() {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
                             // Respons dari server adalah data penjualan dalam format JSON
                             const dataPenjualan = JSON.parse(xhr.responseText);
 
-                            // Lakukan perhitungan DES di sini dan simpan hasilnya dalam variabel
-                            const forecasts = <?php echo json_encode($forecasts); ?>;
+                            // Lakukan perhitungan DES di sini   
+                            calculateForecast(dataPenjualan);
 
-                            // Perbarui tabel dengan data yang diterima
-                            updateTable(dataPenjualan, forecasts);
                         } else {
                             console.error('Error fetching data:', xhr.statusText);
                         }
@@ -352,6 +265,35 @@
                 // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
                 xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
             });
+
+            function calculateForecast(dataPenjualan) {
+
+                const xhr = new XMLHttpRequest();
+
+                // Atur callback untuk menangani respons dari server
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            // Respons dari server adalah data penjualan dalam format JSON
+                            const dataForecast = JSON.parse(xhr.responseText);
+
+                            //update table penjualan
+                            updateTable(dataPenjualan, dataForecast);
+                        } else {
+                            console.error('Error fetching data:', xhr.statusText);
+                        }
+                    }
+                };
+
+                // Atur jenis dan URL permintaan
+                xhr.open('POST', '../process/calculate_forecasting.php', true);
+
+                // Atur header permintaan
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
+                xhr.send('alpha=' + encodeURIComponent(localStorage.getItem('alpha')) + '&beta=' + encodeURIComponent(localStorage.getItem('beta')) + '&data_penjualan=' + encodeURIComponent(JSON.stringify(dataPenjualan)));
+            }
 
             // Fungsi untuk memperbarui tabel dengan data penjualan dan hasil perhitungan DES
             function updateTable(dataPenjualan, forecasts) {
@@ -413,6 +355,18 @@
     <!-- Script untuk menyimpan nilai alpha dan beta -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Bersihkan nilai alpha dan beta dari local storage saat halaman dimuat
+            localStorage.removeItem('alpha');
+            localStorage.removeItem('beta');
+
+            // Ambil elemen input alpha dan beta
+            const alphaInput = document.getElementById('alpha');
+            const betaInput = document.getElementById('beta');
+
+            // Setel nilai input alpha dan beta ke kosong saat halaman dimuat
+            alphaInput.value = '';
+            betaInput.value = '';
+
             // Ambil elemen tombol "Pen" untuk alpha dan beta
             const buttonAlpha = document.getElementById('alphaButton');
             const buttonBeta = document.getElementById('betaButton');
@@ -420,15 +374,15 @@
             // Tambahkan event listener untuk tombol "Pen" alpha
             buttonAlpha.addEventListener('click', function() {
                 // Ambil nilai alpha dari input
-                const alphaInput = parseFloat(document.getElementById('alpha').value);
+                const alphaInputValue = parseFloat(alphaInput.value);
 
                 // Periksa apakah nilai alpha berada dalam rentang yang diizinkan (0.1 - 0.9)
-                if (alphaInput >= 0.1 && alphaInput <= 0.9) {
+                if (alphaInputValue >= 0.1 && alphaInputValue <= 0.9) {
                     // Simpan nilai alpha ke dalam localStorage dengan kunci "alpha"
-                    localStorage.setItem('alpha', alphaInput);
+                    localStorage.setItem('alpha', alphaInputValue);
 
                     // Beri notifikasi bahwa nilai alpha telah disimpan
-                    alert('Nilai alpha telah disimpan: ' + alphaInput);
+                    alert('Nilai alpha telah disimpan: ' + alphaInputValue);
                 } else {
                     // Tampilkan alert jika nilai alpha tidak berada dalam rentang yang diizinkan
                     alert('Nilai alpha harus berada dalam rentang 0.1 sampai 0.9');
@@ -438,15 +392,15 @@
             // Tambahkan event listener untuk tombol "Pen" beta
             buttonBeta.addEventListener('click', function() {
                 // Ambil nilai beta dari input
-                const betaInput = parseFloat(document.getElementById('beta').value);
+                const betaInputValue = parseFloat(betaInput.value);
 
                 // Periksa apakah nilai beta berada dalam rentang yang diizinkan (0.1 - 0.9)
-                if (betaInput >= 0.1 && betaInput <= 0.9) {
+                if (betaInputValue >= 0.1 && betaInputValue <= 0.9) {
                     // Simpan nilai beta ke dalam localStorage dengan kunci "beta"
-                    localStorage.setItem('beta', betaInput);
+                    localStorage.setItem('beta', betaInputValue);
 
                     // Beri notifikasi bahwa nilai beta telah disimpan
-                    alert('Nilai beta telah disimpan: ' + betaInput);
+                    alert('Nilai beta telah disimpan: ' + betaInputValue);
                 } else {
                     // Tampilkan alert jika nilai beta tidak berada dalam rentang yang diizinkan
                     alert('Nilai beta harus berada dalam rentang 0.1 sampai 0.9');
