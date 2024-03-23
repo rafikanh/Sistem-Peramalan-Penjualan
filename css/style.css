@@ -160,12 +160,12 @@ select.form-select {
 }
 
 .btn-custom {
-  background-color: #7066E0 !important; 
-  color: #fff !important; 
+  background-color: #7066e0 !important;
+  color: #fff !important;
 }
 
 .btn-custom:hover {
-  background-color: #655CC9 !important;
+  background-color: #655cc9 !important;
 }
 
 .data-aktual {
@@ -174,15 +174,15 @@ select.form-select {
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; 
-  gap: 10px; 
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .grid-item {
-  background-color: #E0F4FF;
+  background-color: #e0f4ff;
   padding: 6px 12px;
-  border: 1px solid #87C4FF; 
-  border-radius: 3px; 
+  border: 1px solid #87c4ff;
+  border-radius: 3px;
   width: 420px;
   font-size: 16px;
 }
@@ -190,4 +190,57 @@ select.form-select {
 .button-count {
   margin-left: 20px;
   margin-top: 35px;
+}
+
+.gutters-container {
+  background-color: #f0f0f0;
+  padding: 20px;
+}
+
+.gutter {
+  margin-top: 20px;
+  color: white;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.gutter-icon {
+  font-size: 60px; 
+  margin: 20px;
+}
+
+.gutter-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center; 
+  text-align: center; 
+  margin-right: 5px;
+}
+
+.gutter-item b {
+  margin-top: 20px;
+  font-size: 17px;
+}
+
+.gutter-item p {
+  font-size: 18px;
+}
+
+.col-4:nth-child(1) .gutter {
+  background-color: #ff7f0e;
+  height: 100px;
+}
+
+.col-4:nth-child(2) .gutter {
+  background-color: #2ca02c;
+  height: 100px;
+}
+
+.col-4:nth-child(3) .gutter {
+  background-color: #1f77b4;
+  height: 100px;
 }
