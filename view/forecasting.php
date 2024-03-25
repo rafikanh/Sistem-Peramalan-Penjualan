@@ -140,8 +140,19 @@
             </div>
 
             <div class="grid">
-                <div class="grid-item">Peramalan bulan berikutnya...</div>
-                <div class="grid-item">MAPE...%</div>
+                <div class="grid-item">
+                    <div class="d-flex">
+                        <div class="me-1">Peramalan bulan berikutnya</div>
+                        <div id="nextForecast"></div>
+                    </div>
+                </div>
+                <div class="grid-item">
+                    <div id='countPercentError' hidden></div>
+                    <div class="d-flex">
+                        <div class="me-1">MAPE</div>
+                        <div id='mapeValue'></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -172,18 +183,9 @@
             });
         }
 
-        function getAlphaBeta() {
-            const alpha = localStorage.getItem('alpha');
-            const beta = localStorage.getItem('beta')
-
-            document.getElementById('alpha').value = alpha;
-            document.getElementById('beta').value = beta;
-        }
-
         // Panggil fungsi untuk memperbarui opsi tipe saat halaman dimuat
         updateTipeOptions();
 
-        getAlphaBeta();
 
         // Tambahkan event listener untuk memperbarui opsi tipe saat merek dipilih
         merekSelect.addEventListener('change', function() {
@@ -234,39 +236,51 @@
 
             // Tambahkan event listener untuk tombol "Hitung"
             buttonHitung.addEventListener('click', function() {
+
+                const alpha = localStorage.getItem('alpha');
+                const beta = localStorage.getItem('beta')
+
                 const selectedMerek = merekSelect.value;
                 const selectedTipe = tipeSelect.value;
 
-                // Buat objek XMLHttpRequest
-                const xhr = new XMLHttpRequest();
+                if (alpha == null || beta == null) {
+                    alert('Nilai alpha dan beta harus diisi terlebih dahulu.');
+                } else if (selectedMerek == 'Pilih merek' || selectedTipe == 'Pilih tipe') {
+                    alert('Merek dan tipe harus dipilih terlebih dahulu.');
+                } else {
+                    // Buat objek XMLHttpRequest
+                    const xhr = new XMLHttpRequest();
 
-                // Atur callback untuk menangani respons dari server
-                xhr.onreadystatechange = async function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            // Respons dari server adalah data penjualan dalam format JSON
-                            const dataPenjualan = JSON.parse(xhr.responseText);
+                    // Atur callback untuk menangani respons dari server
+                    xhr.onreadystatechange = async function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status === 200) {
+                                // Respons dari server adalah data penjualan dalam format JSON
+                                const dataPenjualan = JSON.parse(xhr.responseText);
 
-                            // Lakukan perhitungan DES di sini   
-                            calculateForecast(dataPenjualan);
+                                // Lakukan perhitungan DES di sini   
+                                calculateForecast(dataPenjualan);
 
-                        } else {
-                            console.error('Error fetching data:', xhr.statusText);
+                            } else {
+                                console.error('Error fetching data:', xhr.statusText);
+                            }
                         }
-                    }
-                };
+                    };
 
-                // Atur jenis dan URL permintaan
-                xhr.open('POST', '../process/get_penjualan.php', true);
+                    // Atur jenis dan URL permintaan
+                    xhr.open('POST', '../process/get_penjualan.php', true);
 
-                // Atur header permintaan
-                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    // Atur header permintaan
+                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-                // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
-                xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
+                    // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
+                    xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
+                }
+
+
             });
 
-            function calculateForecast(dataPenjualan) {
+            function calculateForecast(dataPenjualan, selectedTipe) {
 
                 const xhr = new XMLHttpRequest();
 
@@ -277,7 +291,25 @@
                             // Respons dari server adalah data penjualan dalam format JSON
                             const dataForecast = JSON.parse(xhr.responseText);
 
+                            const lastMonth = dataPenjualan[dataPenjualan.length - 1].Bulan;
+                            const lastYear = dataPenjualan[dataPenjualan.length - 1].Tahun;
+
+                            // Tentukan bulan berikutnya
+                            const nextMonth = lastMonth === 12 ? 1 : lastMonth + 1;
+
+                            // Tentukan tahun berikutnya
+                            const nextYear = nextMonth === 1 ? lastYear + 1 : lastYear;
+
+                            // Buat string bulan dan tahun berikutnya
+                            const nextMonthYearString = nextYear + '-' + (nextMonth < 10 ? '0' + nextMonth : nextMonth);
+
+                            // Tampilkan bulan dan tahun berikutnya
+                            const nextMonthYearElement = document.querySelector('.me-1');
+                            nextMonthYearElement.textContent = 'Peramalan bulan ' + nextMonthYearString;
+
                             //update table penjualan
+                            updateNextForecast(dataForecast[dataForecast.length - 1]['Forecast']);
+                            calculateMape(dataForecast);
                             updateTable(dataPenjualan, dataForecast);
                         } else {
                             console.error('Error fetching data:', xhr.statusText);
@@ -293,6 +325,27 @@
 
                 // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
                 xhr.send('alpha=' + encodeURIComponent(localStorage.getItem('alpha')) + '&beta=' + encodeURIComponent(localStorage.getItem('beta')) + '&data_penjualan=' + encodeURIComponent(JSON.stringify(dataPenjualan)));
+            }
+
+            function updateNextForecast(resultForecast) {
+                const nextForecast = document.getElementById('nextForecast');
+
+                nextForecast.textContent = resultForecast.toFixed(2);
+
+            }
+
+            function calculateMape(dataForecast) {
+                const mapeValue = document.getElementById('mapeValue');
+                const countPercentError = document.getElementById('countPercentError');
+
+                let totalPercentError = 0;
+
+                dataForecast.forEach(element => {
+                    totalPercentError += element['% Error'];
+                });
+
+                countPercentError.textContent = totalPercentError.toFixed(2) + '%';
+                mapeValue.textContent = (totalPercentError / (dataForecast.length - 1)).toFixed(2) + ' %';
             }
 
             // Fungsi untuk memperbarui tabel dengan data penjualan dan hasil perhitungan DES
@@ -324,12 +377,12 @@
 
                     // Pastikan indeks `index` tidak melebihi panjang array `forecasts`
                     if (index < forecasts.length) {
-                        levelCell.textContent = forecasts[index]['Level'];
-                        trendCell.textContent = forecasts[index]['Trend'];
-                        forecastCell.textContent = forecasts[index]['Forecast'];
-                        errorCell.textContent = forecasts[index]['Error'];
-                        abserrorCell.textContent = forecasts[index]['Abs Error'];
-                        percentageerrorCell.textContent = forecasts[index]['% Error'];
+                        levelCell.textContent = forecasts[index]['Level'].toFixed(2);
+                        trendCell.textContent = forecasts[index]['Trend'].toFixed(2);
+                        forecastCell.textContent = forecasts[index]['Forecast'].toFixed(2);
+                        errorCell.textContent = forecasts[index]['Error'].toFixed(2);
+                        abserrorCell.textContent = forecasts[index]['Abs Error'].toFixed(2);
+                        percentageerrorCell.textContent = forecasts[index]['% Error'].toFixed(2) + '%';
                     } else {
                         levelCell.textContent = 'N/A';
                         trendCell.textContent = 'N/A';
