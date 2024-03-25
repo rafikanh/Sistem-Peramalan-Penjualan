@@ -53,8 +53,23 @@
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                $penjualan_tertinggi = $row["total_dt_aktual"]; 
-                $tahun_penjualan_tertinggi = $row["tahun"]; 
+                $penjualan_tertinggi = $row["total_dt_aktual"];
+                $tahun_penjualan_tertinggi = $row["tahun"];
+            }
+
+            $sql_penjualan_merek_tipe = "SELECT db.merek, db.tipe, SUM(dp.dt_aktual) AS total_penjualan FROM dt_barang db JOIN dt_penjualan dp ON db.id_brg = dp.id_brg GROUP BY db.merek, db.tipe ORDER BY total_penjualan DESC LIMIT 1";
+
+            $result = $conn->query($sql_penjualan_merek_tipe);
+
+            $penjualan_tertinggi_merek_tipe = 0;
+            $merek_penjualan_tertinggi = '';
+            $tipe_penjualan_tertinggi = '';
+
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $penjualan_tertinggi_merek_tipe = $row["total_penjualan"];
+                $merek_penjualan_tertinggi = $row["merek"];
+                $tipe_penjualan_tertinggi = $row["tipe"];
             }
 
             $conn->close();
@@ -62,30 +77,49 @@
 
             <div class="gutter-container">
                 <div class="gutter row g-2">
-                    <div class="gutter col-4">
+                    <div class="gutter col-3">
                         <div class="gutter">
-                            <i class="gutter-icon bi bi-display"></i>
                             <div class="gutter-item">
-                                <b>Jumlah Merek</b>
-                                <p><?php echo $jumlah_merek; ?></p>
+                                <a href="../view/data-barang.php">
+                                    <i class="bi bi-arrow-up-right-square icon-gutter-1"></i>
+                                </a>
+                                <b><?php echo $jumlah_merek; ?></b>
+                                <p>Jumlah Merek</p>
                             </div>
                         </div>
                     </div>
-                    <div class="gutter col-4">
+                    <div class="gutter col-3">
                         <div class="gutter">
-                            <i class="gutter-icon bi bi bi-laptop"></i>
                             <div class="gutter-item">
-                                <b>Jumlah Tipe</b>
-                                <p><?php echo $jumlah_tipe; ?></p>
+                                <a href="../view/data-barang.php">
+                                    <i class="bi bi-arrow-up-right-square icon-gutter-2"></i>
+                                </a>
+                                <b><?php echo $jumlah_tipe; ?></b>
+                                <p>Jumlah Tipe</p>
                             </div>
                         </div>
                     </div>
-                    <div class="gutter col-4">
+                    <div class="gutter col-3">
                         <div class="gutter">
-                            <i class="gutter-icon bi bi-bar-chart"></i>
                             <div class="gutter-item">
-                                <b>Penjualan Tertinggi</b>
-                                <p><?php echo "Tahun: " . $tahun_penjualan_tertinggi . " " . "Jumlah: " . $penjualan_tertinggi; ?></p>
+                                <a href="../view/data-penjualan.php">
+                                    <i class="bi bi-arrow-up-right-square icon-gutter-3"></i>
+                                </a>
+                                <b><?php echo $penjualan_tertinggi; ?></b>
+                                <p>Penjualan Tertinggi</p>
+                                <p class="sub">di Tahun <?php echo $tahun_penjualan_tertinggi; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gutter col-3">
+                        <div class="gutter">
+                            <div class="gutter-item">
+                                <a href="../view/data-penjualan.php">
+                                    <i class="bi bi-arrow-up-right-square icon-gutter-3"></i>
+                                </a>
+                                <b><?php echo $penjualan_tertinggi_merek_tipe; ?></b>
+                                <p>Penjualan Tertinggi</p>
+                                <p class="sub"><?php echo $merek_penjualan_tertinggi . ' ' . $tipe_penjualan_tertinggi; ?></p>
                             </div>
                         </div>
                     </div>
