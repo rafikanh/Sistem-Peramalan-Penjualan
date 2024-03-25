@@ -261,36 +261,77 @@
             const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '' && adminInput.trim() !== '';
 
             if (isFormFilled) {
-                Swal.fire({
-                    title: "Apakah Anda ingin menyimpan data baru?",
-                    showDenyButton: true,
-                    showCancelButton: true,
-                    confirmButtonText: "Ya, Simpan",
-                    denyButtonText: `Jangan Simpan`,
-                    cancelButtonText: "Batal"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: "Tersimpan!",
-                            text: "Data baru yang Anda buat sudah disimpan.",
-                            icon: "success",
-                            showConfirmButton: true,
-                            confirmButtonText: "OK"
-                        }).then(() => {
-                            // Submit formulir setelah menampilkan pesan tersimpan
-                            document.querySelector('form').submit();
-                        });
-                    } else if (result.isDenied) {
-                        Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
-                            window.history.back();
-                        });
+                // Buat objek XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+
+                // Atur callback untuk menangani respons dari server
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            // Respons dari server adalah apakah data sudah ada atau belum
+                            const isDataExists = JSON.parse(xhr.responseText);
+
+                            // Jika data sudah ada, tampilkan alert warning
+                            if (isDataExists) {
+                                // Konversi nilai bulan dari angka menjadi nama bulan
+                                const namaBulan = convertToMonthName(bulanInput);
+
+                                Swal.fire("Data sudah tersedia", `Data untuk bulan ${namaBulan} tahun ${tahunInput} dengan merek dan tipe yang sama sudah tersedia.`, "warning");
+                            } else {
+                                // Jika data belum ada, tampilkan konfirmasi untuk menyimpan
+                                Swal.fire({
+                                    title: "Apakah Anda ingin menyimpan data baru?",
+                                    showDenyButton: true,
+                                    showCancelButton: true,
+                                    confirmButtonText: "Ya, Simpan",
+                                    denyButtonText: `Jangan Simpan`,
+                                    cancelButtonText: "Batal"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        Swal.fire({
+                                            title: "Tersimpan!",
+                                            text: "Data baru yang Anda buat sudah disimpan.",
+                                            icon: "success",
+                                            showConfirmButton: true,
+                                            confirmButtonText: "OK"
+                                        }).then(() => {
+                                            // Submit formulir setelah menampilkan pesan tersimpan
+                                            document.querySelector('form').submit();
+                                        });
+                                    } else if (result.isDenied) {
+                                        Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
+                                            window.history.back();
+                                        });
+                                    }
+                                });
+                            }
+                        } else {
+                            console.error('Error fetching data:', xhr.statusText);
+                        }
                     }
-                });
+                };
+
+                // Atur jenis dan URL permintaan
+                xhr.open('POST', '../process/check_duplicate_data.php', true);
+
+                // Atur header permintaan
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                // Kirim permintaan dengan data yang dikirimkan dari formulir
+                xhr.send('bulan=' + encodeURIComponent(bulanInput) + '&tahun=' + encodeURIComponent(tahunInput) + '&tipe=' + encodeURIComponent(tipeInput));
             } else {
                 Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
             }
         });
+
+        // Fungsi untuk mengonversi angka bulan menjadi nama bulan
+        function convertToMonthName(monthNumber) {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            return monthNames[monthNumber - 1];
+        }
     </script>
+
+
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
