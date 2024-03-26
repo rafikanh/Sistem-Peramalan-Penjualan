@@ -149,7 +149,7 @@
                 <div class="grid-item">
                     <div id='countPercentError' hidden></div>
                     <div class="d-flex">
-                        <div class="me-1">MAPE</div>
+                        <div class="me-1">MAPE : </div>
                         <div id='mapeValue'></div>
                     </div>
                 </div>
@@ -259,7 +259,7 @@
                                 const dataPenjualan = JSON.parse(xhr.responseText);
 
                                 // Lakukan perhitungan DES di sini   
-                                calculateForecast(dataPenjualan);
+                                calculateForecast(dataPenjualan, selectedTipe);
 
                             } else {
                                 console.error('Error fetching data:', xhr.statusText);
@@ -291,26 +291,41 @@
                             // Respons dari server adalah data penjualan dalam format JSON
                             const dataForecast = JSON.parse(xhr.responseText);
 
-                            const lastMonth = dataPenjualan[dataPenjualan.length - 1].Bulan;
-                            const lastYear = dataPenjualan[dataPenjualan.length - 1].Tahun;
+                            //ambil bulan dan tahun terakhir dari data penjualan
+                            const lastMonth = dataPenjualan[dataPenjualan.length - 1].bulan_tahun.split(' ')[0];
+                            const lastYear = parseInt(dataPenjualan[dataPenjualan.length - 1].bulan_tahun.split(' ')[1]);
+
+                            // Tentukan bulan terakhir dalam bentuk angka
+                            const lastMonthNumber = getMonthNumber(lastMonth);
 
                             // Tentukan bulan berikutnya
-                            const nextMonth = lastMonth === 12 ? 1 : lastMonth + 1;
+                            const nextMonth = lastMonthNumber === 12 ? 1 : lastMonthNumber + 1;
 
                             // Tentukan tahun berikutnya
-                            const nextYear = nextMonth === 1 ? lastYear + 1 : lastYear;
+                            const nextYear = lastMonthNumber === 12 ? lastYear + 1 : lastYear;
 
                             // Buat string bulan dan tahun berikutnya
-                            const nextMonthYearString = nextYear + '-' + (nextMonth < 10 ? '0' + nextMonth : nextMonth);
+                            const nextMonthYearString = getMonthString(nextMonth) + ' ' + nextYear;
 
                             // Tampilkan bulan dan tahun berikutnya
                             const nextMonthYearElement = document.querySelector('.me-1');
                             nextMonthYearElement.textContent = 'Peramalan bulan ' + nextMonthYearString;
 
-                            //update table penjualan
-                            updateNextForecast(dataForecast[dataForecast.length - 1]['Forecast']);
-                            calculateMape(dataForecast);
+                            //update forecast selanjutnya
+                            const nextForecastData = dataForecast[dataForecast.length - 1]['Forecast'];
+                            updateNextForecast(nextForecastData);
+
+                            //hitung mape & simpan ke variable resultMape
+                            const resultMape = calculateMape(dataForecast);
+
+                            //simpan riwayat forecast
+                            saveCurrentForecast(selectedTipe, nextForecastData, resultMape, nextMonth, nextYear);
+
+
+                            //update data table
                             updateTable(dataPenjualan, dataForecast);
+
+
                         } else {
                             console.error('Error fetching data:', xhr.statusText);
                         }
@@ -327,10 +342,39 @@
                 xhr.send('alpha=' + encodeURIComponent(localStorage.getItem('alpha')) + '&beta=' + encodeURIComponent(localStorage.getItem('beta')) + '&data_penjualan=' + encodeURIComponent(JSON.stringify(dataPenjualan)));
             }
 
+            function saveCurrentForecast(id_brg, res_forecast, mape, bulan, tahun) {
+                const xhr = new XMLHttpRequest();
+
+                // Atur callback untuk menangani respons dari server
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            // Respons dari server adalah data penjualan dalam format JSON
+                            const result = JSON.parse(xhr.responseText);
+
+                            console.log(result);
+
+
+                        } else {
+                            console.error('Error post data:', xhr.statusText);
+                        }
+                    }
+                };
+
+                // Atur jenis dan URL permintaan
+                xhr.open('POST', '../process/process-save-history.php', true);
+
+                // Atur header permintaan
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
+                xhr.send('id_brg=' + id_brg + '&res_forecast=' + res_forecast + '&mape=' + mape + '&bulan=' + bulan + '&tahun=' + tahun);
+            }
+
             function updateNextForecast(resultForecast) {
                 const nextForecast = document.getElementById('nextForecast');
 
-                nextForecast.textContent = resultForecast.toFixed(2);
+                nextForecast.textContent = ' : ' + resultForecast.toFixed(2);
 
             }
 
@@ -345,7 +389,11 @@
                 });
 
                 countPercentError.textContent = totalPercentError.toFixed(2) + '%';
-                mapeValue.textContent = (totalPercentError / (dataForecast.length - 1)).toFixed(2) + ' %';
+
+                resultMape = (totalPercentError / (dataForecast.length - 1)).toFixed(2);
+
+                mapeValue.textContent = resultMape + ' %';
+                return resultMape;
             }
 
             // Fungsi untuk memperbarui tabel dengan data penjualan dan hasil perhitungan DES
@@ -462,10 +510,10 @@
         });
     </script>
 
-
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
     </script>
+    <script type="text/javascript" src="../utils/dateformat_utils.js"></script>
 </body>
 
 </html>
