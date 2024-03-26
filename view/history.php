@@ -15,11 +15,17 @@
     <?php include '../view/component/sidebar.php'; ?>
     <div class="content-large">
         <div class="container-fluid">
-            <div class="d-flex">
-                <a href="../view/forecasting.php"><i class="bi bi-arrow-left-short custom-icon-style"></i></a>&ensp;
-                <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="mb-3 me-5">History Peramalan</h1>
+            <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center">
+                    <a href="../view/forecasting.php"><i class="bi bi-arrow-left-short custom-icon-style"></i></a>&ensp;
+                    <h1 class="mb-3">History Peramalan</h1>
                 </div>
+                <form class="d-flex" action="" method="post">
+                    <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" style="width: 200px;">
+                    <button class="btn btn-outline-dark flex-shrink-0" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
             </div>
 
             <div class="scrollable-table mb-4">
