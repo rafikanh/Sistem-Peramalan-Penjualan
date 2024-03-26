@@ -123,7 +123,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">Bulan Tahun</th>
+                            <th scope="col">Tanggal</th>
                             <th scope="col">Nilai Aktual</th>
                             <th scope="col">Level</th>
                             <th scope="col">Trend</th>

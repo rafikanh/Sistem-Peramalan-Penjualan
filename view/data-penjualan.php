@@ -59,7 +59,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">Bulan - Tahun</th>
+                            <th scope="col">Tanggal</th>
                             <th scope="col">Merek</th>
                             <th scope="col">Tipe</th>
                             <th scope="col">Nilai Aktual</th>
