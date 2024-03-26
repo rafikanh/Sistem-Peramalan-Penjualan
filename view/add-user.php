@@ -69,35 +69,49 @@
                 // Memeriksa apakah formulir valid atau tidak
                 const isFormValid = isFormFilled; // Tambahkan kondisi validasi formulir sesuai kebutuhan
 
-                if (isFormValid) {
-                    Swal.fire({
-                        title: "Apakah Anda ingin menyimpan data baru?",
-                        showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: "Ya, Simpan",
-                        denyButtonText: `Jangan Simpan`,
-                        cancelButtonText: "Batal"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Jika pengguna mengklik "Ya, Simpan", tampilkan pesan "Tersimpan!" dan kirim formulir setelahnya
-                            Swal.fire({
-                                title: "Tersimpan!",
-                                text: "Data baru yang Anda buat sudah disimpan.",
-                                icon: "success",
-                                showConfirmButton: true,
-                                confirmButtonText: "OK"
-                            }).then(() => {
-                                document.querySelector('form').submit();
-                            });
-                        } else if (result.isDenied) {
-                            // Jika pengguna memilih "Jangan Simpan", tampilkan pesan informasi dan kembali ke halaman sebelumnya
-                            Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
-                                window.history.back();
-                            });
+                if (isFormFilled) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status === 200) {
+                                const isUserExists = JSON.parse(xhr.responseText);
+                                if (isUserExists) {
+                                    Swal.fire("Data sudah tersedia", "Data user sudah tersedia.", "warning");
+                                } else {
+                                    Swal.fire({
+                                        title: "Apakah Anda ingin menyimpan data baru?",
+                                        showDenyButton: true,
+                                        showCancelButton: true,
+                                        confirmButtonText: "Ya, Simpan",
+                                        denyButtonText: `Jangan Simpan`,
+                                        cancelButtonText: "Batal"
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            Swal.fire({
+                                                title: "Tersimpan!",
+                                                text: "Data baru yang Anda buat sudah disimpan.",
+                                                icon: "success",
+                                                showConfirmButton: true,
+                                                confirmButtonText: "OK"
+                                            }).then(() => {
+                                                document.querySelector('form').submit();
+                                            });
+                                        } else if (result.isDenied) {
+                                            Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
+                                                window.history.back();
+                                            });
+                                        }
+                                    });
+                                }
+                            } else {
+                                console.error('Error fetching data:', xhr.statusText);
+                            }
                         }
-                    });
+                    };
+                    xhr.open('POST', '../process/check-data-user.php', true);
+                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    xhr.send('email=' + encodeURIComponent(emailInput.value.trim()) + '&password=' + encodeURIComponent(passwordInput.value.trim()));
                 } else {
-                    // Menampilkan pesan bahwa data harus diisi
                     Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
                 }
             });
