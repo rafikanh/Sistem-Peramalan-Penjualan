@@ -2,26 +2,36 @@
 // Sertakan file konfigurasi database
 require_once "../koneksi.php";
 
-// Mengambil nilai dari form login
-$email = $_POST['email'];
-$password = $_POST['password'];
+// Mulai sesi
+session_start();
 
-// Menggunakan fungsi md5 untuk hash password
-$hashedPassword = md5($password);
+// Cek apakah form login disubmit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Mengambil nilai dari form login
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-// Query untuk memeriksa apakah username dan password valid
-$sql = "SELECT * FROM users WHERE email='$email' AND password='$hashedPassword'";
-$result = $conn->query($sql);
+    // Menggunakan fungsi md5 untuk hash password
+    $hashedPassword = md5($password);
 
-if ($result->num_rows > 0) {
-    // Login berhasil
-    session_start();
-    $_SESSION['email'] = $email;
-    header("Location: ../view/dashboard.php"); // Ganti dashboard.php dengan halaman setelah login
-} else {
-    // Login gagal
-    echo "<script>alert('Email atau password salah.'); window.location.href = '../index.php';</script>";
+    // Query untuk memeriksa apakah username dan password valid
+    $sql = "SELECT * FROM users WHERE email='$email' AND password='$hashedPassword'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // Login berhasil
+        $_SESSION['email'] = $email;
+        $_SESSION['logged_in'] = true;
+
+        // Periksa apakah ada URL yang diminta sebelumnya
+        $redirect_url = isset($_SESSION['redirect_url']) ? $_SESSION['redirect_url'] : "../view/dashboard.php";
+        
+        // Alihkan pengguna ke halaman yang diminta sebelumnya atau halaman dashboard
+        header("Location: $redirect_url");
+        exit(); // Pastikan untuk keluar dari skrip setelah melakukan pengalihan
+    } else {
+        // Login gagal, tampilkan pesan kesalahan
+        $errorMessage = "Email atau password salah. Mohon periksa kembali.";
+    }
 }
-
-$conn->close();
 ?>

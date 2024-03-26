@@ -1,8 +1,17 @@
 <?php
+session_start();
+
 // Sertakan file konfigurasi database
 require_once "koneksi.php";
 
-// Cek apakah form login disubmit
+// Cek apakah pengguna sudah login
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    // Jika sudah login, arahkan ke halaman dashboard atau halaman setelah login
+    header("Location: view/dashboard.php");
+    exit();
+}
+
+// Proses login
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Mengambil nilai dari form login
     $email = $_POST['email'];
@@ -17,9 +26,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         // Login berhasil
-        session_start();
         $_SESSION['email'] = $email;
-        header("Location: view/dashboard.php"); // Ganti dashboard.php dengan halaman setelah login
+        $_SESSION['logged_in'] = true;
+
+        // Periksa apakah ada URL yang diminta sebelumnya
+        $redirect_url = isset($_SESSION['redirect_url']) ? $_SESSION['redirect_url'] : "view/dashboard.php";
+
+        // Alihkan pengguna ke halaman yang diminta sebelumnya atau halaman dashboard
+        header("Location: $redirect_url");
         exit(); // Pastikan untuk keluar dari skrip setelah melakukan pengalihan
     } else {
         // Login gagal, tampilkan pesan kesalahan
@@ -27,6 +41,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<!-- Isi dari halaman login -->
+
+</html>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -55,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <h3 class="mb-4"><b>LOGIN</b></h3>
 
                             <!-- Tampilkan pesan kesalahan jika login gagal -->
-                            <?php if(isset($errorMessage)): ?>
+                            <?php if (isset($errorMessage)) : ?>
                                 <div class="alert alert-danger" role="alert">
                                     <?php echo $errorMessage; ?>
                                 </div>

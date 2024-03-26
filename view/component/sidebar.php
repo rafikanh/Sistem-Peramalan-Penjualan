@@ -54,7 +54,7 @@
                 </li>
             </ul>
             <hr>
-            <a href="../index.php" class="nav-link link-logout">
+            <a href="../process/logout_proses.php" class="nav-link link-logout">
                 <i class="bi bi-box-arrow-left"></i></i>&ensp;
                 Keluar
             </a>
