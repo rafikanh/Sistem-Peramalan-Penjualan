@@ -192,6 +192,11 @@ select.form-select {
   margin-top: 35px;
 }
 
+.custom-icon-style {
+  font-size: 35px;
+  color: black;
+}
+
 .gutter-container {
   padding-top: 20px;
 }

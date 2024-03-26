@@ -149,7 +149,7 @@
                 <div class="grid-item">
                     <div id='countPercentError' hidden></div>
                     <div class="d-flex">
-                        <div class="me-1">MAPE : </div>
+                        <div class="me-1">MAPE</div>
                         <div id='mapeValue'></div>
                     </div>
                 </div>
@@ -392,7 +392,7 @@
 
                 resultMape = (totalPercentError / (dataForecast.length - 1)).toFixed(2);
 
-                mapeValue.textContent = resultMape + ' %';
+                mapeValue.textContent = ' : ' + resultMape + ' %';
                 return resultMape;
             }
 
