@@ -20,12 +20,10 @@
                     <a href="../view/forecasting.php"><i class="bi bi-arrow-left-short custom-icon-style"></i></a>&ensp;
                     <h1 class="mb-3">History Peramalan</h1>
                 </div>
-                <form class="d-flex" action="" method="post">
-                    <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" style="width: 200px;">
-                    <button class="btn btn-outline-dark flex-shrink-0" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
+                <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" id="search_query" style="width: 200px;">
+                <button class="btn btn-outline-dark flex-shrink-0" id="search_button">
+                    <i class="bi bi-search"></i>
+                </button>
             </div>
 
             <div class="scrollable-table mb-4">
@@ -50,6 +48,47 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            getHistoryData();
+            addSearchFunction();
+            addClearSearch();
+
+        });
+
+        function addClearSearch() {
+            const searchKeyword = document.getElementById('search_query');
+            searchKeyword.addEventListener('input', function() {
+                if (searchKeyword.value == '') {
+                    getHistoryData();
+                }
+            })
+        }
+
+        function addSearchFunction() {
+            const buttonSearch = document.getElementById('search_button');
+            const searchKeyword = document.getElementById('search_query');
+
+            buttonSearch.addEventListener('click', function(event) {
+                console.log(searchKeyword.value);
+                const xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            const searchData = JSON.parse(xhr.responseText);
+                            updateTable(searchData);
+                        } else {
+                            console.error('Error post data:', xhr.statusText);
+                        }
+                    }
+
+                }
+
+                xhr.open('GET', '../process/get-search-forecast-history.php?keyword=' + searchKeyword.value, true);
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                xhr.send();
+            })
+        }
+
+        function getHistoryData() {
             const xhr = new XMLHttpRequest();
 
             // Atur callback untuk menangani respons dari server
@@ -76,7 +115,7 @@
 
             // Kirim permintaan
             xhr.send();
-        });
+        }
 
         function updateTable(dataHistory) {
             const tbody = document.querySelector('.table tbody');

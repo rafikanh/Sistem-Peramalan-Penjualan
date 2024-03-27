@@ -2,8 +2,12 @@
 // Sertakan file koneksi ke database
 include '../koneksi.php';
 
-// Periksa apakah parameter merek dan id_brg telah dikirim melalui metode POST
+// Periksa apakah request methodnya GET
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
+
+    //ambil parameter keyword
+    $keyword = $_GET['keyword'];
+
     // Query SQL untuk mengambil data history
     $sql = "SELECT 
     dh.id_brg, 
@@ -13,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     dh.res_forecast,
     dh.mape 
     FROM dt_history AS dh INNER JOIN dt_barang as db ON dh.id_brg = db.id_brg
+    WHERE db.merek LIKE '%$keyword%' OR db.tipe LIKE '%$keyword%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dh.tahun, dh.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$keyword%'
     ORDER BY dh.id_history DESC
     ";
 
@@ -35,6 +40,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     // Kembalikan data penjualan dalam format JSON
     echo json_encode($dataHistory);
 } else {
-    // Jika parameter tidak lengkap, kembalikan pesan error
-    echo "Error: Request not allowed";
+    // Kembalikan pesan error
+    echo "Error: Request not allowed.";
 }
