@@ -1,17 +1,11 @@
 <?php
-session_start();
-
 // Sertakan file konfigurasi database
 require_once "koneksi.php";
 
-// Cek apakah pengguna sudah login
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    // Jika sudah login, arahkan ke halaman dashboard atau halaman setelah login
-    header("Location: view/dashboard.php");
-    exit();
-}
+// Mulai sesi
+session_start();
 
-// Proses login
+// Cek apakah form login disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Mengambil nilai dari form login
     $email = $_POST['email'];
@@ -28,13 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Login berhasil
         $_SESSION['email'] = $email;
         $_SESSION['logged_in'] = true;
-
-        // Periksa apakah ada URL yang diminta sebelumnya
-        $redirect_url = isset($_SESSION['redirect_url']) ? $_SESSION['redirect_url'] : "view/dashboard.php";
-
-        // Alihkan pengguna ke halaman yang diminta sebelumnya atau halaman dashboard
-        header("Location: $redirect_url");
-        exit(); // Pastikan untuk keluar dari skrip setelah melakukan pengalihan
+        
+        // Alihkan pengguna langsung ke halaman dashboard
+        header("Location: view/dashboard.php");
+        exit(); // Pastikan untuk keluar setelah melakukan pengalihan
     } else {
         // Login gagal, tampilkan pesan kesalahan
         $errorMessage = "Email atau password salah. Mohon periksa kembali.";

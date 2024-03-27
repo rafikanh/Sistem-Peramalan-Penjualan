@@ -1,16 +1,4 @@
-<?php
-// Mulai sesi
-session_start();
-
-// Periksa apakah pengguna sudah login
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    // Jika belum login, simpan URL yang diminta sebelumnya
-    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
-    // Redirect ke halaman login
-    header("Location: ../index.php");
-    exit(); // Pastikan untuk keluar setelah melakukan pengalihan
-}
-?>
+<?php require_once '../process/check_login.php'; ?>
 
 <!DOCTYPE html>
 <html>

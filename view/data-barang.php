@@ -1,3 +1,5 @@
+<?php require_once '../process/check_login.php'; ?>
+
 <!DOCTYPE html>
 <html>
 

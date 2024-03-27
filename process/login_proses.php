@@ -22,13 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Login berhasil
         $_SESSION['email'] = $email;
         $_SESSION['logged_in'] = true;
-
-        // Periksa apakah ada URL yang diminta sebelumnya
-        $redirect_url = isset($_SESSION['redirect_url']) ? $_SESSION['redirect_url'] : "../view/dashboard.php";
         
-        // Alihkan pengguna ke halaman yang diminta sebelumnya atau halaman dashboard
-        header("Location: $redirect_url");
-        exit(); // Pastikan untuk keluar dari skrip setelah melakukan pengalihan
+        header("Location: ../view/dahsboard.php");
+        exit(); 
     } else {
         // Login gagal, tampilkan pesan kesalahan
         $errorMessage = "Email atau password salah. Mohon periksa kembali.";
