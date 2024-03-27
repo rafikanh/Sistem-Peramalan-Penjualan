@@ -18,8 +18,8 @@
             <h1>Data Penjualan</h1>
             <div class="d-flex mb-4">
                 <a href="../view/add-data-penjualan.php" class="btn btn-primary me-5 flex-shrink-0">Tambah Data</a>
-                <form class="d-flex" action="" method="post">
-                    <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query">
+                <form id="searchForm" class="d-flex" action="" method="post">
+                    <input id="searchInput" class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" value="<?php echo isset($_POST['search_query']) ? $_POST['search_query'] : ''; ?>">
                     <button class="btn btn-outline-dark flex-shrink-0" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
@@ -92,6 +92,20 @@
             </div>
         </div>
     </div>
+
+    <!-- Script Search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+
+            // Fungsi untuk mengembalikan semua data saat input pencarian dikosongkan
+            searchInput.addEventListener('search', function() {
+                if (searchInput.value === '') {
+                    document.getElementById('searchForm').submit();
+                }
+            });
+        });
+    </script>
 
     <!-- SweetAlert2 script hapus data -->
     <?php
