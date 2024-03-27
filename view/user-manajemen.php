@@ -18,8 +18,8 @@
             <h1>User Manajemen</h1>
             <div class="d-flex mb-4">
                 <a href="../view/add-user.php" class="btn btn-primary me-2 flex-shrink-0">Tambah User</a>
-                <form class="d-flex" action="" method="post">
-                    <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_email">
+                <form id="searchForm" class="d-flex" action="" method="post">
+                    <input id="searchInput" class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_email" value="<?php echo isset($_POST['search_email']) ? $_POST['search_email'] : ''; ?>">
                     <button class="btn btn-outline-dark flex-shrink-0" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
@@ -87,6 +87,20 @@
             ?>
         </div>
     </div>
+
+    <!-- Script Search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+
+            // Fungsi untuk mengembalikan semua data saat input pencarian dikosongkan
+            searchInput.addEventListener('search', function() {
+                if (searchInput.value === '') {
+                    document.getElementById('searchForm').submit();
+                }
+            });
+        });
+    </script>
 
     <!-- SweetAlert2 script -->
     <?php
