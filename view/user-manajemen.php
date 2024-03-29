@@ -73,10 +73,10 @@
 
                 // Tampilkan data dalam tabel
                 echo "<tr>
-                    <td>$nama_depan</td>
-                    <td>$nama_belakang</td>
-                    <td>$email</td>
-                    <td id='password-cell-$userID'>$password</td>
+                    <td class='align-middle'>$nama_depan</td>
+                    <td class='align-middle'>$nama_belakang</td>
+                    <td class='align-middle'>$email</td>
+                    <td class='align-middle' id='password-cell-$userID'>$password</td>
                     <td class='d-flex'>
                         <a href='../view/update-user.php?id=$userID' type='button' class='btn btn-warning me-2'>
                             <i class='bi bi-pencil-square'></i>
