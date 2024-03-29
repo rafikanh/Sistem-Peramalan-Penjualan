@@ -15,10 +15,20 @@
 
 <body>
     <?php include '../view/component/sidebar.php'; ?>
-    <div class="content-small">
+    <div class="content-medium">
         <div class="container-fluid">
             <h1 class="mb-4">Tambah User</h1>
             <form action="../process/process-add-user.php" method="post">
+                <div class="d-flex">
+                    <div class="mb-3">
+                        <label for="nama_depan" class="input-data-label">Nama Depan</label>
+                        <input type="text" class="input-data" name="nm_depan" id="nama_depan" placeholder="Masukkan nama depan" required>
+                    </div>
+                    <div class="mb-3 ms-5">
+                        <label for="nama_belakang" class="input-data-label">Nama Belakang</label>
+                        <input type="text" class="input-data" name="nm_belakang" id="nama_belakang" placeholder="Masukkan nama belakang" required>
+                    </div>
+                </div>
                 <div class="d-flex">
                     <div class="mb-3">
                         <label for="email" class="input-data-label">Email</label>
@@ -62,14 +72,13 @@
         <script>
             document.getElementById('saveBtn').addEventListener('click', function() {
                 // Mendapatkan semua input data
-                const emailInput = document.getElementById('email');
-                const passwordInput = document.getElementById('password');
+                const namaDepanInput = document.getElementById('nama_depan').value.trim();
+                const namaBelakangInput = document.getElementById('nama_belakang').value.trim();
+                const emailInput = document.getElementById('email').value.trim();
+                const passwordInput = document.getElementById('password').value.trim();
 
                 // Memeriksa apakah kedua input sudah diisi atau belum
-                const isFormFilled = emailInput.value.trim() !== '' && passwordInput.value.trim() !== '';
-
-                // Memeriksa apakah formulir valid atau tidak
-                const isFormValid = isFormFilled; // Tambahkan kondisi validasi formulir sesuai kebutuhan
+                const isFormFilled = namaDepanInput !== '' && namaBelakangInput !== '' && emailInput !== '' && passwordInput !== '';
 
                 if (isFormFilled) {
                     const xhr = new XMLHttpRequest();
@@ -110,9 +119,11 @@
                             }
                         }
                     };
+
+                    // Kirim data ke check-data-user.php
                     xhr.open('POST', '../process/check-data-user.php', true);
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                    xhr.send('email=' + encodeURIComponent(emailInput.value.trim()) + '&password=' + encodeURIComponent(passwordInput.value.trim()));
+                    xhr.send('nm_depan=' + encodeURIComponent(namaDepanInput) + '&nm_belakang=' + encodeURIComponent(namaBelakangInput) + '&email=' + encodeURIComponent(emailInput));
                 } else {
                     Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
                 }

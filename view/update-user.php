@@ -15,7 +15,7 @@
 
 <body>
     <?php include '../view/component/sidebar.php'; ?>
-    <div class="content-small">
+    <div class="content-large">
         <div class="container-fluid">
             <h1 class="mb-4">Update User</h1>
 
@@ -34,6 +34,8 @@
                 if ($result->num_rows > 0) {
                     // Ambil data pengguna
                     $row = $result->fetch_assoc();
+                    $nama_depan = $row['nm_depan'];
+                    $nama_belakang = $row['nm_belakang'];
                     $email = $row['email'];
                     $password = $row['password']; // Ini dianggap masih dalam format MD5
                 } else {
@@ -50,14 +52,33 @@
             <form action="../process/process-update-user.php" method="post">
                 <div class="d-flex">
                     <div class="mb-3">
+                        <label for="nama_depan" class="input-data-label">Nama Depan</label>
+                        <input type="text" class="input-data" name="nm_depan" id="nama_depan" value="<?php echo $nama_depan; ?>" placeholder="Masukkan nama depan" required>
+                    </div>
+                    <div class="mb-3 ms-5">
+                        <label for="nama_belakang" class="input-data-label">Nama Belakang</label>
+                        <input type="text" class="input-data" name="nm_belakang" id="nama_belakang" value="<?php echo $nama_belakang; ?>" placeholder="Masukkan nama belakang" required>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="mb-3">
                         <label for="email" class="input-data-label">Email</label>
                         <input type="text" class="input-data" id="email" name="email" value="<?php echo $email; ?>" placeholder="Masukkan email" required>
                     </div>
                     <div class="mb-3 ms-5">
                         <label for="password" class="input-data-label">Password</label>
                         <div class="input-group">
-                            <input type="password" class="input-data" name="password" id="password" placeholder="Masukkan password" required>
-                            <i class="bi bi-eye-fill" id="togglePassword"></i>
+                            <input type="text" class="input-data" name="password" id="password" value="<?php $passwordLength = strlen($password);
+                             echo str_repeat('•', $passwordLength); ?>" placeholder="Password">
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="mb-3">
+                        <label for="ganti_password" class="input-data-label">Ganti Password</label>
+                        <div class="input-group">
+                            <input type="text" class="input-data" name="ganti_password" id="ganti_password" placeholder="Ganti password">
+                            <i class="bi bi-eye-slash-fill" id="togglePassword"></i>
                         </div>
                     </div>
                 </div>
@@ -70,23 +91,41 @@
             </form>
         </div>
 
+        <!-- Script Password -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const passwordDiv = document.getElementById('password');
+
+                // Membuat event untuk mengganti teks menjadi karakter bintang
+                passwordDiv.addEventListener('keydown', function(event) {
+                    // Mengganti teks dengan karakter bintang
+                    passwordDiv.textContent = '•'.repeat(passwordDiv.textContent.length);
+                });
+            });
+        </script>
+
         <!-- Show or Hide Password -->
         <script>
+            window.onload = function() {
+                const passwordInput = document.getElementById('ganti_password');
+                passwordInput.type = 'password';
+            };
+
             document.getElementById('togglePassword').addEventListener('click', function() {
-                const passwordInput = document.getElementById('password');
+                const passwordInput = document.getElementById('ganti_password');
                 if (passwordInput.type === 'password') {
                     passwordInput.type = 'text';
-                    this.classList.remove('bi-eye-fill');
-                    this.classList.add('bi-eye-slash-fill');
-                } else {
-                    passwordInput.type = 'password';
                     this.classList.remove('bi-eye-slash-fill');
                     this.classList.add('bi-eye-fill');
+                } else {
+                    passwordInput.type = 'password';
+                    this.classList.remove('bi-eye-fill');
+                    this.classList.add('bi-eye-slash-fill');
                 }
             });
         </script>
 
-       <!-- SweetAlert2 script -->
+        <!-- SweetAlert2 script -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>

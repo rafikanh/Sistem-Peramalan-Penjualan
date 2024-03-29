@@ -21,7 +21,7 @@
             <div class="d-flex mb-4">
                 <a href="../view/add-user.php" class="btn btn-primary me-2 flex-shrink-0">Tambah User</a>
                 <form id="searchForm" class="d-flex" action="" method="post">
-                    <input id="searchInput" class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_email" value="<?php echo isset($_POST['search_email']) ? $_POST['search_email'] : ''; ?>">
+                    <input id="searchInput" class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" value="<?php echo isset($_POST['search_query']) ? $_POST['search_query'] : ''; ?>">
                     <button class="btn btn-outline-dark flex-shrink-0" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
@@ -32,21 +32,23 @@
             // Sertakan file koneksi
             include '../koneksi.php';
 
-            // Inisialisasi variabel pencarian
-            $search_email = isset($_POST['search_email']) ? $_POST['search_email'] : '';
+            // Ambil nilai dari form pencarian
+            $searchQuery = isset($_POST['search_query']) ? $_POST['search_query'] : '';
 
             // Query SQL untuk mengambil data user
-            $query = "SELECT * FROM users WHERE email LIKE '%$search_email%'";
-            $result = $conn->query($query);
+            $sql = "SELECT id, nm_depan, nm_belakang, email, password FROM users WHERE nm_depan LIKE '%$searchQuery%' OR nm_belakang LIKE '%$searchQuery%' OR email LIKE '%$searchQuery%'";
+            $result = $conn->query($sql);
 
             // Tampilkan data user dalam tabel
             echo "<div class='scrollable-table-container'>";
             echo "<table class='table'>";
             echo "<thead>
                 <tr>
-                    <th scope='col' class='text-center'>Email</th>
-                    <th scope='col' class='text-center'>Password</th>
-                    <th scope='col' class='text-center'>Aksi</th>
+                    <th scope='col'>Nama Depan</th>
+                    <th scope='col'>Nama Belakang</th>
+                    <th scope='col'>Email</th>
+                    <th scope='col'>Password</th>
+                    <th scope='col'>Aksi</th>
                 </tr>
             </thead>
             <tbody>";
@@ -61,6 +63,8 @@
 
             while ($row = $result->fetch_assoc()) {
                 $userID = $row['id'];
+                $nama_depan = $row['nm_depan'];
+                $nama_belakang = $row['nm_belakang'];
                 $email = $row['email'];
                 $encryptedPassword = $row['password'];
 
@@ -69,9 +73,11 @@
 
                 // Tampilkan data dalam tabel
                 echo "<tr>
-                    <td class='align-middle text-center'>$email</td>
-                    <td class='align-middle text-center' id='password-cell-$userID'>$password</td>
-                    <td class='d-flex justify-content-center'>
+                    <td>$nama_depan</td>
+                    <td>$nama_belakang</td>
+                    <td>$email</td>
+                    <td id='password-cell-$userID'>$password</td>
+                    <td class='d-flex'>
                         <a href='../view/update-user.php?id=$userID' type='button' class='btn btn-warning me-2'>
                             <i class='bi bi-pencil-square'></i>
                         </a>
@@ -133,7 +139,7 @@
         $result->data_seek(0);
         while ($row = $result->fetch_assoc()) {
             $userID = $row['id'];
-            echo "document.getElementById('password-cell-$userID').innerText = '********';\n";
+            echo "document.getElementById('password-cell-$userID').innerText = '••••••••';\n";
         }
         ?>
     </script>
