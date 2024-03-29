@@ -21,7 +21,7 @@
             <div class="d-flex mb-4">
                 <a href="add-data-barang.php" class="btn btn-primary me-5 flex-shrink-0">Tambah Data</a>
                 <form id="searchForm" class="d-flex" action="" method="post">
-                    <input id="searchInput" class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" value="<?php echo isset($_POST['search_query']) ? $_POST['search_query'] : ''; ?>">
+                    <input id="searchInput" class="form-control form-control-custom-A me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" value="<?php echo isset($_POST['search_query']) ? $_POST['search_query'] : ''; ?>">
                     <button class="btn btn-outline-dark flex-shrink-0" type="submit">
                         <i class="bi bi-search"></i>
                     </button>

@@ -18,11 +18,11 @@
     <div class="content-large">
         <div class="container-fluid">
             <div class="d-flex align-items-center">
-                <div class="d-flex align-items-center">
-                    <a href="../view/forecasting.php"><i class="bi bi-arrow-left-short custom-icon-style"></i></a>&ensp;
+                <div class="d-flex">
+                    <a href="../view/forecasting.php"><i class="bi bi-caret-left-fill custom-icon-style"></i></a>&ensp;
                     <h1 class="mb-3">History Peramalan</h1>
                 </div>
-                <input class="form-control me-2" type="search" placeholder="Cari" aria-label="search" id="search_query" style="width: 200px;">
+                <input class="form-control form-control-custom-C me-2" type="search" placeholder="Cari" aria-label="search" id="search_query" style="width: 200px;">
                 <button class="btn btn-outline-dark flex-shrink-0" id="search_button">
                     <i class="bi bi-search"></i>
                 </button>

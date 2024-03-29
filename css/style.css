@@ -50,8 +50,16 @@ p {
   font-size: 20px;
 }
 
-.form-control {
-  margin-left: 400px;
+.form-control-custom-A {
+  margin-left: 430px;
+}
+
+.form-control-custom-B {
+  margin-left: 320px;
+}
+
+.form-control-custom-C {
+  margin-left: 230px;
 }
 
 .table thead th {
@@ -166,6 +174,10 @@ select.form-select {
 
 .btn-custom:hover {
   background-color: #655cc9 !important;
+}
+
+.import-button {
+  width: 150px;
 }
 
 .data-aktual {
