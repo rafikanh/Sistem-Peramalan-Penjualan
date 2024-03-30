@@ -156,16 +156,9 @@
                     </div>
                 </div>
 
-                <div class="d-flex">
-                    <div class="data-aktual">
-                        <label for="dt_aktual" class="input-data-label">Data Aktual</label>
-                        <input type="text" class="input-data" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required>
-                    </div>
-
-                    <div class="mb-3 ms-5">
-                        <label for="admin" class="input-data-label">Admin</label>
-                        <input type="text" class="input-data" name="admin" id="admin" placeholder="Masukkan nama admin" required>
-                    </div>
+                <div class="data-aktual">
+                    <label for="dt_aktual" class="input-data-label">Data Aktual</label>
+                    <input type="text" class="input-data" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required>
                 </div>
 
                 <div class="d-flex">
@@ -257,10 +250,9 @@
             const merekInput = document.querySelector('select[name="merek"]').value;
             const tipeInput = document.querySelector('select[name="tipe"]').value;
             const dtAktualInput = document.getElementById('dt_aktual').value;
-            const adminInput = document.getElementById('admin').value;
 
             // Memeriksa apakah semua input sudah diisi
-            const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '' && adminInput.trim() !== '';
+            const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '';
 
             if (isFormFilled) {
                 // Buat objek XMLHttpRequest

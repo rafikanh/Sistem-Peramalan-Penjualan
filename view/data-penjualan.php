@@ -19,9 +19,12 @@
         <div class="container-fluid">
             <h1>Data Penjualan</h1>
             <div class="d-flex mb-4">
-                <a href="../view/add-data-penjualan.php" class="btn btn-primary me-5 flex-shrink-0">Tambah Data</a>
+                <a href="../view/add-data-penjualan.php" class="btn btn-primary me-3 flex-shrink-0">Tambah Data</a>
+                <button type="button" class="btn btn-success import-button" data-bs-toggle="modal" data-bs-target="#importModal">
+                    Import Data
+                </button>
                 <form id="searchForm" class="d-flex" action="" method="post">
-                    <input id="searchInput" class="form-control me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" value="<?php echo isset($_POST['search_query']) ? $_POST['search_query'] : ''; ?>">
+                    <input id="searchInput" class="form-control form-control-custom-B me-2" type="search" placeholder="Cari" aria-label="search" name="search_query" value="<?php echo isset($_POST['search_query']) ? $_POST['search_query'] : ''; ?>">
                     <button class="btn btn-outline-dark flex-shrink-0" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
@@ -36,13 +39,13 @@
             $search_query = isset($_POST['search_query']) ? $_POST['search_query'] : '';
 
             // Query SQL untuk mengambil data penjualan dengan informasi merek, tipe, bulan, dan tahun
-            $sql = "SELECT dp.id_penjualan, DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, db.merek, db.tipe, dp.dt_aktual, dp.admin 
+            $sql = "SELECT dp.id_penjualan, DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, db.merek, db.tipe, dp.dt_aktual 
             FROM dt_penjualan dp
             INNER JOIN dt_barang db ON dp.id_brg = db.id_brg";
 
             // Tambahkan filter berdasarkan kriteria pencarian jika ada
             if (!empty($search_query)) {
-                $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%' OR dp.admin LIKE '%$search_query%'";
+                $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%'";
             }
 
             // Tambahkan klausa ORDER BY untuk mengurutkan berdasarkan bulan dan tahun
@@ -53,6 +56,27 @@
             // Periksa keberhasilan eksekusi query
             if ($result === false) {
                 die("Error executing the query: " . $conn->error);
+            }
+
+            // Periksa apakah admin telah login dan informasinya tersedia di sesi
+            if (isset($_SESSION['id'])) {
+                $admin_id = $_SESSION['id'];
+
+                // Query SQL untuk mengambil informasi admin berdasarkan admin_id
+                $admin_query = "SELECT nm_depan, nm_belakang FROM users WHERE id = $admin_id";
+                $admin_result = $conn->query($admin_query);
+
+                if ($admin_result->num_rows > 0) {
+                    // Ambil informasi admin dari hasil query
+                    $admin_row = $admin_result->fetch_assoc();
+                    $admin_name = $admin_row['nm_depan'] . ' ' . $admin_row['nm_belakang'];
+                } else {
+                    // Jika data admin tidak ditemukan, atur nilai admin menjadi default atau tampilkan pesan kesalahan
+                    $admin_name = "Tidak ada nama admin";
+                }
+            } else {
+                // Jika admin belum login, atur nilai admin menjadi default atau tampilkan pesan kesalahan
+                $admin_name = "Admin belum login";
             }
             ?>
 
@@ -76,7 +100,7 @@
                                 <td class="align-middle"><?php echo $row['merek']; ?></td>
                                 <td class="align-middle"><?php echo $row['tipe']; ?></td>
                                 <td class="align-middle"><?php echo $row['dt_aktual']; ?></td>
-                                <td class="align-middle"><?php echo $row['admin']; ?></td>
+                                <td class="align-middle"><?php echo $admin_name; ?></td>
                                 <td class="d-flex">
                                     <a href="../view/update-data-penjualan.php?id_penjualan=<?php echo $row['id_penjualan']; ?>" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
@@ -91,6 +115,30 @@
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <!-- Modal Import Data -->
+        <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <b class="modal-title" id="importModalLabel">Import Data</b>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="importForm" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="fileInput" class="form-label">Pilih File</label>
+                                <input class="form-control" type="file" id="fileInput" name="fileInput">
+                                <small id="fileHelp" class="form-text text-muted">Ekstensi (xlsx, csv)</small>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-success" onclick="submitForm()">Import</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
