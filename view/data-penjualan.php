@@ -39,13 +39,14 @@
             $search_query = isset($_POST['search_query']) ? $_POST['search_query'] : '';
 
             // Query SQL untuk mengambil data penjualan dengan informasi merek, tipe, bulan, dan tahun
-            $sql = "SELECT dp.id_penjualan, DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, db.merek, db.tipe, dp.dt_aktual 
+            $sql = "SELECT dp.id_penjualan, DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') AS bulan_tahun, db.merek, db.tipe, dp.dt_aktual, CONCAT(u.nm_depan,' ', u.nm_belakang) as admin
             FROM dt_penjualan dp
-            INNER JOIN dt_barang db ON dp.id_brg = db.id_brg";
+            INNER JOIN dt_barang db ON dp.id_brg = db.id_brg
+            INNER JOIN users u ON dp.id_user= u.id";
 
             // Tambahkan filter berdasarkan kriteria pencarian jika ada
             if (!empty($search_query)) {
-                $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%'";
+                $sql .= " WHERE db.merek LIKE '%$search_query%' OR db.tipe LIKE '%$search_query%' OR DATE_FORMAT(STR_TO_DATE(CONCAT_WS('-', dp.tahun, dp.bulan, '01'), '%Y-%m-%d'), '%M %Y') LIKE '%$search_query%' OR CONCAT(u.nm_depan,' ', u.nm_belakang) LIKE '%$search_query%'";
             }
 
             // Tambahkan klausa ORDER BY untuk mengurutkan berdasarkan bulan dan tahun
@@ -57,29 +58,7 @@
             if ($result === false) {
                 die("Error executing the query: " . $conn->error);
             }
-
-            // Periksa apakah admin telah login dan informasinya tersedia di sesi
-            if (isset($_SESSION['id'])) {
-                $admin_id = $_SESSION['id'];
-
-                // Query SQL untuk mengambil informasi admin berdasarkan admin_id
-                $admin_query = "SELECT nm_depan, nm_belakang FROM users WHERE id = $admin_id";
-                $admin_result = $conn->query($admin_query);
-
-                if ($admin_result->num_rows > 0) {
-                    // Ambil informasi admin dari hasil query
-                    $admin_row = $admin_result->fetch_assoc();
-                    $admin_name = $admin_row['nm_depan'] . ' ' . $admin_row['nm_belakang'];
-                } else {
-                    // Jika data admin tidak ditemukan, atur nilai admin menjadi default atau tampilkan pesan kesalahan
-                    $admin_name = "Tidak ada nama admin";
-                }
-            } else {
-                // Jika admin belum login, atur nilai admin menjadi default atau tampilkan pesan kesalahan
-                $admin_name = "Admin belum login";
-            }
             ?>
-
 
             <div class="scrollable-table-container">
                 <table class="table">
@@ -100,7 +79,7 @@
                                 <td class="align-middle"><?php echo $row['merek']; ?></td>
                                 <td class="align-middle"><?php echo $row['tipe']; ?></td>
                                 <td class="align-middle"><?php echo $row['dt_aktual']; ?></td>
-                                <td class="align-middle"><?php echo $admin_name; ?></td>
+                                <td class="align-middle"><?php echo $row['admin']; ?></td>
                                 <td class="d-flex">
                                     <a href="../view/update-data-penjualan.php?id_penjualan=<?php echo $row['id_penjualan']; ?>" type="button" class="btn btn-warning me-2">
                                         <i class="bi bi-pencil-square"></i>
@@ -108,8 +87,6 @@
                                     <button type="button" class="btn btn-danger delete-btn" onclick="confirmDelete(<?php echo $row['id_penjualan']; ?>)">
                                         <i class="bi bi-trash"></i>
                                     </button>
-
-
                                 </td>
                             </tr>
                         <?php endwhile; ?>

@@ -1,14 +1,16 @@
 <?php
 include '../koneksi.php';
 
-if (isset($_POST['id_penjualan'], $_POST['dt_aktual'], $_POST['admin'], $_POST['merek'], $_POST['bulan'], $_POST['tahun'], $_POST['tipe'])) {
+session_start();
+
+if (isset($_POST['id_penjualan'], $_POST['dt_aktual'], $_POST['merek'], $_POST['bulan'], $_POST['tahun'], $_POST['tipe'], $_SESSION['id'])) {
     $id_penjualan = $_POST['id_penjualan'];
     $dt_aktual = $_POST['dt_aktual'];
-    $admin = $_POST['admin'];
     $merek = $_POST['merek'];
     $bulan = $_POST['bulan'];
     $tahun = $_POST['tahun'];
     $tipe = $_POST['tipe'];
+    $id_user = $_SESSION['id'];
 
     // Dapatkan ID barang berdasarkan merek dan tipe yang dipilih
     $sql_get_barang_id = "SELECT id_brg FROM dt_barang WHERE merek = '$merek' AND id_brg = '$tipe'";
@@ -19,7 +21,7 @@ if (isset($_POST['id_penjualan'], $_POST['dt_aktual'], $_POST['admin'], $_POST['
         $id_brg = $row['id_brg'];
 
         // Update data penjualan dengan ID barang yang ditemukan
-        $sql_update_data_penjualan = "UPDATE dt_penjualan SET dt_aktual = '$dt_aktual', admin = '$admin', bulan = '$bulan', tahun = '$tahun', id_brg = '$id_brg' WHERE id_penjualan = $id_penjualan";
+        $sql_update_data_penjualan = "UPDATE dt_penjualan SET dt_aktual = '$dt_aktual', bulan = '$bulan', tahun = '$tahun', id_brg = '$id_brg', id_user = '$id_user' WHERE id_penjualan = $id_penjualan";
 
         if ($conn->query($sql_update_data_penjualan) === TRUE) {
             header("Location: ../view/data-penjualan.php");

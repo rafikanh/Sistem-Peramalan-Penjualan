@@ -19,10 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
+        $data = $result->fetch_assoc();
         // Login berhasil
-        $_SESSION['email'] = $email;
+        $_SESSION['email'] = $data['email'];
+        $_SESSION['id'] = $data['id'];
         $_SESSION['logged_in'] = true;
-        
+
         // Alihkan pengguna langsung ke halaman dashboard
         header("Location: view/dashboard.php");
         exit(); // Pastikan untuk keluar setelah melakukan pengalihan
@@ -32,13 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<!-- Isi dari halaman login -->
-
-</html>
-
 
 <!DOCTYPE html>
 <html lang="en">
