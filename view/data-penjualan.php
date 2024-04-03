@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <!-- Read Excel File -->
+    <script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
     <!-- Style -->
     <link rel="stylesheet" href="../css/style.css">
     <title>Sistem Peramalan Penjualan</title>
@@ -106,14 +108,14 @@
                         <form id="importForm" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="fileInput" class="form-label">Pilih File</label>
-                                <input class="form-control" type="file" id="fileInput" name="fileInput">
-                                <small id="fileHelp" class="form-text text-muted">Ekstensi (xlsx, csv)</small>
+                                <input class="form-control" type="file" id="fileInput" name="fileInput" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                                <small id="fileHelp" class="form-text text-muted">Ekstensi xlsx</small>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="button" class="btn btn-success" onclick="submitForm()">Import</button>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="importBtn">Import</button>
                     </div>
                 </div>
             </div>
@@ -132,6 +134,55 @@
                 }
             });
         });
+    </script>
+
+    <!-- Script Read Excel -->
+    <script>
+        var importBtn = document.getElementById('importBtn');
+
+        importBtn.addEventListener('click', function() {
+            var fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length !== 0) {
+                var file = fileInput.files[0];
+                readXlsxFile(file).then(function(data) {
+
+                    const xhr = new XMLHttpRequest();
+
+                    // Atur callback untuk menangani respons dari server
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status === 200) {
+                                // Respons dari server adalah data penjualan dalam format JSON
+                                const result = JSON.parse(xhr.responseText);
+
+                                if (result['status'] === 'success') {
+                                    Swal.fire("Berhasil", result['message'], "success").then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire("Gagal", result['message'], "warning");
+                                }
+
+                            } else {
+                                Swal.fire("Gagal", xhr.statusText, "warning");
+                            }
+                        }
+                    };
+
+                    // Atur jenis dan URL permintaan
+                    xhr.open('POST', '../process/process-import-data.php', true);
+
+                    // Atur header permintaan
+                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                    // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
+                    xhr.send('data=' + JSON.stringify(data));
+                });
+
+            } else {
+                Swal.fire("Gagal", "File belum dipilih", "warning");
+            }
+        })
     </script>
 
     <!-- SweetAlert2 script hapus data -->
