@@ -12,6 +12,8 @@
     <script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
     <!-- Style -->
     <link rel="stylesheet" href="../css/style.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="../assets/img/logo.png">
     <title>Sistem Peramalan Penjualan</title>
 </head>
 

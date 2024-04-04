@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- Style -->
     <link rel="stylesheet" href="../css/style.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="../assets/img/logo.png">
     <title>Sistem Peramalan Penjualan</title>
 </head>
 
@@ -69,7 +71,7 @@
                         <label for="password" class="input-data-label">Password</label>
                         <div class="input-group">
                             <input type="text" class="input-data" name="password" id="password" value="<?php $passwordLength = strlen($password);
-                             echo str_repeat('•', $passwordLength); ?>" placeholder="Password">
+                                                                                                        echo str_repeat('•', $passwordLength); ?>" placeholder="Password">
                         </div>
                     </div>
                 </div>
@@ -90,92 +92,93 @@
                 </div>
             </form>
         </div>
+    </div>
 
-        <!-- Script Password -->
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const passwordDiv = document.getElementById('password');
+    <!-- Script Password -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordDiv = document.getElementById('password');
 
-                // Membuat event untuk mengganti teks menjadi karakter bintang
-                passwordDiv.addEventListener('keydown', function(event) {
-                    // Mengganti teks dengan karakter bintang
-                    passwordDiv.textContent = '•'.repeat(passwordDiv.textContent.length);
-                });
+            // Membuat event untuk mengganti teks menjadi karakter bintang
+            passwordDiv.addEventListener('keydown', function(event) {
+                // Mengganti teks dengan karakter bintang
+                passwordDiv.textContent = '•'.repeat(passwordDiv.textContent.length);
             });
-        </script>
+        });
+    </script>
 
-        <!-- Show or Hide Password -->
-        <script>
-            window.onload = function() {
-                const passwordInput = document.getElementById('ganti_password');
+    <!-- Show or Hide Password -->
+    <script>
+        window.onload = function() {
+            const passwordInput = document.getElementById('ganti_password');
+            passwordInput.type = 'password';
+        };
+
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('ganti_password');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('bi-eye-slash-fill');
+                this.classList.add('bi-eye-fill');
+            } else {
                 passwordInput.type = 'password';
-            };
+                this.classList.remove('bi-eye-fill');
+                this.classList.add('bi-eye-slash-fill');
+            }
+        });
+    </script>
 
-            document.getElementById('togglePassword').addEventListener('click', function() {
-                const passwordInput = document.getElementById('ganti_password');
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    this.classList.remove('bi-eye-slash-fill');
-                    this.classList.add('bi-eye-fill');
-                } else {
-                    passwordInput.type = 'password';
-                    this.classList.remove('bi-eye-fill');
-                    this.classList.add('bi-eye-slash-fill');
-                }
-            });
-        </script>
+    <!-- SweetAlert2 script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        <!-- SweetAlert2 script -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            // Mendapatkan semua input data
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
 
-        <script>
-            document.getElementById('saveBtn').addEventListener('click', function() {
-                // Mendapatkan semua input data
-                const emailInput = document.getElementById('email');
-                const passwordInput = document.getElementById('password');
+            // Memeriksa apakah kedua input sudah diisi atau belum
+            const isFormFilled = emailInput.value.trim() !== '' && passwordInput.value.trim() !== '';
 
-                // Memeriksa apakah kedua input sudah diisi atau belum
-                const isFormFilled = emailInput.value.trim() !== '' && passwordInput.value.trim() !== '';
+            // Memeriksa apakah formulir valid atau tidak
+            const isFormValid = isFormFilled; // Tambahkan kondisi validasi formulir sesuai kebutuhan
 
-                // Memeriksa apakah formulir valid atau tidak
-                const isFormValid = isFormFilled; // Tambahkan kondisi validasi formulir sesuai kebutuhan
+            if (isFormValid) {
+                Swal.fire({
+                    title: "Apakah Anda ingin menyimpan perubahan data?",
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Simpan",
+                    denyButtonText: `Jangan Simpan`,
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika pengguna mengklik "Ya, Simpan", tampilkan pesan "Tersimpan!" dan kirim formulir setelahnya
+                        Swal.fire({
+                            title: "Tersimpan!",
+                            text: "Perubahan yang Anda buat sudah disimpan.",
+                            icon: "success",
+                            showConfirmButton: true,
+                            confirmButtonText: "OK"
+                        }).then(() => {
+                            document.querySelector('form').submit();
+                        });
+                    } else if (result.isDenied) {
+                        // Jika pengguna memilih "Jangan Simpan", tampilkan pesan informasi dan kembali ke halaman sebelumnya
+                        Swal.fire("Perubahan data tidak disimpan", "", "info").then(() => {
+                            window.history.back();
+                        });
+                    }
+                });
+            } else {
+                // Menampilkan pesan bahwa data harus diisi
+                Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
+            }
+        });
+    </script>
 
-                if (isFormValid) {
-                    Swal.fire({
-                        title: "Apakah Anda ingin menyimpan perubahan data?",
-                        showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: "Ya, Simpan",
-                        denyButtonText: `Jangan Simpan`,
-                        cancelButtonText: "Batal"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Jika pengguna mengklik "Ya, Simpan", tampilkan pesan "Tersimpan!" dan kirim formulir setelahnya
-                            Swal.fire({
-                                title: "Tersimpan!",
-                                text: "Perubahan yang Anda buat sudah disimpan.",
-                                icon: "success",
-                                showConfirmButton: true,
-                                confirmButtonText: "OK"
-                            }).then(() => {
-                                document.querySelector('form').submit();
-                            });
-                        } else if (result.isDenied) {
-                            // Jika pengguna memilih "Jangan Simpan", tampilkan pesan informasi dan kembali ke halaman sebelumnya
-                            Swal.fire("Perubahan data tidak disimpan", "", "info").then(() => {
-                                window.history.back();
-                            });
-                        }
-                    });
-                } else {
-                    // Menampilkan pesan bahwa data harus diisi
-                    Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
-                }
-            });
-        </script>
-
-        <!-- Bootstrap -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 
 </html>

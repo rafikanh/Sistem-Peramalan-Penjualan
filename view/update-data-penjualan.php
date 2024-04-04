@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- Style -->
     <link rel="stylesheet" href="../css/style.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="../assets/img/logo.png">
     <title>Sistem Peramalan Penjualan</title>
 </head>
 
@@ -46,7 +48,6 @@
                 }
             }
             ?>
-
 
             <!-- Form untuk memperbarui data penjualan -->
             <form method="POST" action="../process/process-update-data-penjualan.php">
@@ -181,106 +182,107 @@
                 </div>
             </form>
         </div>
+    </div>
 
-        <!-- Script Untuk Pengambilan Tipe Berdasarkan Merek -->
-        <script>
-            // Ambil elemen select merek dan tipe
-            const merekSelect = document.getElementById('merekSelect');
-            const tipeSelect = document.getElementById('tipeSelect');
+    <!-- Script Untuk Pengambilan Tipe Berdasarkan Merek -->
+    <script>
+        // Ambil elemen select merek dan tipe
+        const merekSelect = document.getElementById('merekSelect');
+        const tipeSelect = document.getElementById('tipeSelect');
 
-            // Fungsi untuk memperbarui opsi tipe berdasarkan merek yang dipilih
-            function updateTipeOptions() {
-                const selectedMerek = merekSelect.value;
+        // Fungsi untuk memperbarui opsi tipe berdasarkan merek yang dipilih
+        function updateTipeOptions() {
+            const selectedMerek = merekSelect.value;
 
-                // Kosongkan opsi tipe sebelum memperbarui
-                tipeSelect.innerHTML = '<option selected>Pilih tipe</option>';
+            // Kosongkan opsi tipe sebelum memperbarui
+            tipeSelect.innerHTML = '<option selected>Pilih tipe</option>';
 
-                // Kirim permintaan AJAX untuk mendapatkan data tipe yang berhubungan dengan merek yang dipilih
-                const xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            const tipes = JSON.parse(xhr.responseText);
+            // Kirim permintaan AJAX untuk mendapatkan data tipe yang berhubungan dengan merek yang dipilih
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        const tipes = JSON.parse(xhr.responseText);
 
-                            // Hapus opsi tipe yang sudah ada
-                            while (tipeSelect.firstChild) {
-                                tipeSelect.removeChild(tipeSelect.firstChild);
-                            }
-
-                            // Tambahkan opsi tipe baru
-                            tipes.forEach(tipe => {
-                                const option = document.createElement('option');
-                                option.value = tipe['id_brg'];
-                                option.textContent = tipe['tipe'];
-                                tipeSelect.appendChild(option);
-                                option.selected = tipe['id_brg'] === '<?php echo isset($data_penjualan['id_brg']) && $data_penjualan['id_brg'] == $tipe['id_brg']; ?>';
-                            });
-                        } else {
-                            console.error('Error fetching data:', xhr.statusText);
+                        // Hapus opsi tipe yang sudah ada
+                        while (tipeSelect.firstChild) {
+                            tipeSelect.removeChild(tipeSelect.firstChild);
                         }
+
+                        // Tambahkan opsi tipe baru
+                        tipes.forEach(tipe => {
+                            const option = document.createElement('option');
+                            option.value = tipe['id_brg'];
+                            option.textContent = tipe['tipe'];
+                            tipeSelect.appendChild(option);
+                            option.selected = tipe['id_brg'] === '<?php echo isset($data_penjualan['id_brg']) && $data_penjualan['id_brg'] == $tipe['id_brg']; ?>';
+                        });
+                    } else {
+                        console.error('Error fetching data:', xhr.statusText);
                     }
-                };
-                xhr.open('POST', '../process/get_tipe.php');
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.send('merek=' + encodeURIComponent(selectedMerek));
-            }
-
-            // Panggil fungsi untuk memperbarui opsi tipe saat halaman dimuat
-            updateTipeOptions();
-
-            // Tambahkan event listener untuk memperbarui opsi tipe saat merek dipilih
-            merekSelect.addEventListener('change', updateTipeOptions);
-        </script>
-
-        <!-- SweetAlert2 script -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        <script>
-            document.getElementById('saveBtn').addEventListener('click', function() {
-                // Mendapatkan nilai input bulan, tahun, merek, tipe, dan data aktual
-                const bulanInput = document.querySelector('select[name="bulan"]').value;
-                const tahunInput = document.querySelector('select[name="tahun"]').value;
-                const merekInput = document.querySelector('select[name="merek"]').value;
-                const tipeInput = document.querySelector('select[name="tipe"]').value;
-                const dtAktualInput = document.getElementById('dt_aktual').value;
-
-                // Memeriksa apakah semua input sudah diisi
-                const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '';
-
-                if (isFormFilled) {
-                    Swal.fire({
-                        title: "Apakah Anda ingin menyimpan perubahan data?",
-                        showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: "Ya, Simpan",
-                        denyButtonText: `Jangan Simpan`,
-                        cancelButtonText: "Batal"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: "Tersimpan!",
-                                text: "Perubahan yang Anda buat sudah disimpan.",
-                                icon: "success",
-                                showConfirmButton: true,
-                                confirmButtonText: "OK"
-                            }).then(() => {
-                                // Submit formulir setelah menampilkan pesan tersimpan
-                                document.querySelector('form').submit();
-                            });
-                        } else if (result.isDenied) {
-                            Swal.fire("Perubahan data tidak disimpan", "", "info").then(() => {
-                                window.history.back();
-                            });
-                        }
-                    });
-                } else {
-                    Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
                 }
-            });
-        </script>
+            };
+            xhr.open('POST', '../process/get_tipe.php');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('merek=' + encodeURIComponent(selectedMerek));
+        }
 
-        <!-- Bootstrap -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        // Panggil fungsi untuk memperbarui opsi tipe saat halaman dimuat
+        updateTipeOptions();
+
+        // Tambahkan event listener untuk memperbarui opsi tipe saat merek dipilih
+        merekSelect.addEventListener('change', updateTipeOptions);
+    </script>
+
+    <!-- SweetAlert2 script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            // Mendapatkan nilai input bulan, tahun, merek, tipe, dan data aktual
+            const bulanInput = document.querySelector('select[name="bulan"]').value;
+            const tahunInput = document.querySelector('select[name="tahun"]').value;
+            const merekInput = document.querySelector('select[name="merek"]').value;
+            const tipeInput = document.querySelector('select[name="tipe"]').value;
+            const dtAktualInput = document.getElementById('dt_aktual').value;
+
+            // Memeriksa apakah semua input sudah diisi
+            const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '';
+
+            if (isFormFilled) {
+                Swal.fire({
+                    title: "Apakah Anda ingin menyimpan perubahan data?",
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Simpan",
+                    denyButtonText: `Jangan Simpan`,
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: "Tersimpan!",
+                            text: "Perubahan yang Anda buat sudah disimpan.",
+                            icon: "success",
+                            showConfirmButton: true,
+                            confirmButtonText: "OK"
+                        }).then(() => {
+                            // Submit formulir setelah menampilkan pesan tersimpan
+                            document.querySelector('form').submit();
+                        });
+                    } else if (result.isDenied) {
+                        Swal.fire("Perubahan data tidak disimpan", "", "info").then(() => {
+                            window.history.back();
+                        });
+                    }
+                });
+            } else {
+                Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
+            }
+        });
+    </script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 
 </html>

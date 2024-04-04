@@ -10,13 +10,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Style -->
     <link rel="stylesheet" href="../css/sidebar.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="../assets/img/logo.png">
     <title>Sistem Peramalan Penjualan</title>
 </head>
 
 <body>
     <div class="bg">
         <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 280px;">
-            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+            <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
                 <img src="../assets/img/logo.png" class="logo"><br>&ensp; &ensp; &ensp;
                 <span class="fs-4">Sistem Peramalan Penjualan</span>
             </a>
@@ -80,7 +82,6 @@
             });
         });
     </script>
-
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>

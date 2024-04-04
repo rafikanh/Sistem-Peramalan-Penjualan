@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- Style -->
     <link rel="stylesheet" href="../css/style.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="../assets/img/logo.png">
     <title>Sistem Peramalan Penjualan</title>
 </head>
 
@@ -95,8 +97,6 @@
                 $tipeData[$merek] = $tipes;
             }
             ?>
-
-
 
             <div class="d-flex">
                 <div class="mb-3">
@@ -278,8 +278,6 @@
                     // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
                     xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
                 }
-
-
             });
 
             function calculateForecast(dataPenjualan, selectedTipe) {
@@ -323,11 +321,8 @@
                             //simpan riwayat forecast
                             saveCurrentForecast(selectedTipe, nextForecastData, resultMape, nextMonth, nextYear);
 
-
                             //update data table
                             updateTable(dataPenjualan, dataForecast);
-
-
                         } else {
                             console.error('Error fetching data:', xhr.statusText);
                         }
@@ -353,10 +348,7 @@
                         if (xhr.status === 200) {
                             // Respons dari server adalah data penjualan dalam format JSON
                             const result = JSON.parse(xhr.responseText);
-
                             console.log(result);
-
-
                         } else {
                             console.error('Error post data:', xhr.statusText);
                         }
@@ -375,9 +367,7 @@
 
             function updateNextForecast(resultForecast) {
                 const nextForecast = document.getElementById('nextForecast');
-
                 nextForecast.textContent = ' : ' + resultForecast.toFixed(2);
-
             }
 
             function calculateMape(dataForecast) {

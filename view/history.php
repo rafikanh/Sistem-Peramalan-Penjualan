@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- Style -->
     <link rel="stylesheet" href="../css/style.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="../assets/img/logo.png">
     <title>Sistem Peramalan Penjualan</title>
 </head>
 
@@ -53,7 +55,6 @@
             getHistoryData();
             addSearchFunction();
             addClearSearch();
-
         });
 
         function addClearSearch() {
@@ -81,7 +82,6 @@
                             console.error('Error post data:', xhr.statusText);
                         }
                     }
-
                 }
 
                 xhr.open('GET', '../process/get-search-forecast-history.php?keyword=' + searchKeyword.value, true);
@@ -101,8 +101,6 @@
                         const dataHistory = JSON.parse(xhr.responseText);
 
                         updateTable(dataHistory);
-
-
                     } else {
                         console.error('Error post data:', xhr.statusText);
                     }
@@ -137,8 +135,6 @@
                         row.appendChild(cell);
                     }
                 });
-
-
                 tbody.appendChild(row);
             });
         }
