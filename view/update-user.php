@@ -59,7 +59,7 @@
                     </div>
                     <div class="mb-3 ms-5">
                         <label for="nama_belakang" class="input-data-label">Nama Belakang</label>
-                        <input type="text" class="input-data" name="nm_belakang" id="nama_belakang" value="<?php echo $nama_belakang; ?>" placeholder="Masukkan nama belakang" required>
+                        <input type="text" class="input-data" name="nm_belakang" id="nama_belakang" value="<?php echo $nama_belakang; ?>" placeholder="Masukkan nama belakang">
                     </div>
                 </div>
                 <div class="d-flex">
@@ -134,11 +134,12 @@
     <script>
         document.getElementById('saveBtn').addEventListener('click', function() {
             // Mendapatkan semua input data
+            const namaDepanInput = document.getElementById('nama_depan');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
 
             // Memeriksa apakah kedua input sudah diisi atau belum
-            const isFormFilled = emailInput.value.trim() !== '' && passwordInput.value.trim() !== '';
+            const isFormFilled = namaDepanInput.value.trim() !== '' && emailInput.value.trim() !== '' && passwordInput.value.trim() !== '';
 
             // Memeriksa apakah formulir valid atau tidak
             const isFormValid = isFormFilled; // Tambahkan kondisi validasi formulir sesuai kebutuhan
