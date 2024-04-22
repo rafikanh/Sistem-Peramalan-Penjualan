@@ -78,7 +78,7 @@ p {
 
 .scrollable-table {
   overflow-y: scroll;
-  max-height: 400px;
+  max-height: 450px;
   background-color: #ececec;
 }
 
