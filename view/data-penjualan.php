@@ -146,6 +146,14 @@
             var fileInput = document.getElementById('fileInput');
             if (fileInput.files.length !== 0) {
                 var file = fileInput.files[0];
+                var extension = file.name.split('.').pop().toLowerCase();
+
+                // Periksa apakah ekstensi file sesuai dengan yang diharapkan
+                if (extension !== 'xlsx') {
+                    Swal.fire("Gagal", "Hanya file Excel (.xlsx) yang diperbolehkan", "warning");
+                    return;
+                }
+
                 readXlsxFile(file).then(function(data) {
 
                     const xhr = new XMLHttpRequest();
