@@ -72,7 +72,7 @@
                             <th scope="col">Merek</th>
                             <th scope="col">Tipe</th>
                             <th scope="col">Nilai Aktual</th>
-                            <th scope="col">Admin</th>
+                            <th scope="col">Nama User</th>
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>
