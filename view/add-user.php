@@ -28,7 +28,7 @@
                     </div>
                     <div class="mb-3 ms-5">
                         <label for="nama_belakang" class="input-data-label">Nama Belakang</label>
-                        <input type="text" class="input-data" name="nm_belakang" id="nama_belakang" placeholder="Masukkan nama belakang" required>
+                        <input type="text" class="input-data" name="nm_belakang" id="nama_belakang" placeholder="Masukkan nama belakang">
                     </div>
                 </div>
                 <div class="d-flex">
@@ -76,12 +76,11 @@
         document.getElementById('saveBtn').addEventListener('click', function() {
             // Mendapatkan semua input data
             const namaDepanInput = document.getElementById('nama_depan').value.trim();
-            const namaBelakangInput = document.getElementById('nama_belakang').value.trim();
             const emailInput = document.getElementById('email').value.trim();
             const passwordInput = document.getElementById('password').value.trim();
 
             // Memeriksa apakah kedua input sudah diisi atau belum
-            const isFormFilled = namaDepanInput !== '' && namaBelakangInput !== '' && emailInput !== '' && passwordInput !== '';
+            const isFormFilled = namaDepanInput !== '' && emailInput !== '' && passwordInput !== '';
 
             if (isFormFilled) {
                 const xhr = new XMLHttpRequest();
@@ -126,7 +125,7 @@
                 // Kirim data ke check-data-user.php
                 xhr.open('POST', '../process/check-data-user.php', true);
                 xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                xhr.send('nm_depan=' + encodeURIComponent(namaDepanInput) + '&nm_belakang=' + encodeURIComponent(namaBelakangInput) + '&email=' + encodeURIComponent(emailInput));
+                xhr.send('nm_depan=' + encodeURIComponent(namaDepanInput) + '&email=' + encodeURIComponent(emailInput));
             } else {
                 Swal.fire("Formulir belum lengkap", "Silakan isi semua data terlebih dahulu.", "warning");
             }
