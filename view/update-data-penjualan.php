@@ -56,7 +56,7 @@
                 <div class="d-flex">
                     <div class="mb-3">
                         <label for="bulan" class="input-data-label">Bulan</label>
-                        <select class="form-select" name="bulan" aria-label="Default select example">
+                        <select class="form-select" name="bulan" id="bulan" aria-label="Default select example">
                             <!-- Tampilkan data bulan dari database -->
                             <?php
                             // Query SQL untuk mengambil data bulan dari tabel dt_penjualan tanpa duplikasi
@@ -80,7 +80,7 @@
 
                     <div class="mb-3 ms-5">
                         <label for="tahun" class="input-data-label">Tahun</label>
-                        <select class="form-select" name="tahun" aria-label="Default select example">
+                        <select class="form-select" name="tahun" id="tahun" aria-label="Default select example">
                             <!-- Tampilkan data tahun dari database -->
                             <?php
                             // Query SQL untuk mengambil data tahun dari tabel dt_penjualan tanpa duplikasi
@@ -102,7 +102,7 @@
 
                 <div class="d-flex">
                     <div class="mb-3">
-                        <label for="merek" class="input-data-label">Merek</label>
+                        <label for="merekSelect" class="input-data-label">Merek</label>
                         <select id="merekSelect" name="merek" class="form-select" aria-label="Default select example" onchange="updateTipeOptions()">
                             <?php
                             // Query SQL untuk mengambil data merek dan tipe yang terkait dengan data penjualan yang sedang diedit
@@ -136,7 +136,7 @@
                     </div>
 
                     <div class="mb-3 ms-5">
-                        <label for="tipe" class="input-data-label">Tipe</label>
+                        <label for="tipeSelect" class="input-data-label">Tipe</label>
                         <select id="tipeSelect" name="tipe" class="form-select" aria-label="Default select example">
                             <?php
                             // Ambil merek yang dipilih sebelumnya
@@ -215,7 +215,7 @@
                             option.value = tipe['id_brg'];
                             option.textContent = tipe['tipe'];
                             tipeSelect.appendChild(option);
-                            option.selected = tipe['id_brg'] === '<?php echo isset($data_penjualan['id_brg']) && $data_penjualan['id_brg'] == $tipe['id_brg']; ?>';
+                            option.selected = tipe['id_brg'] === '<?php echo isset($data_penjualan['id_brg']) ? $data_penjualan['id_brg'] : ''; ?>';
                         });
                     } else {
                         console.error('Error fetching data:', xhr.statusText);
