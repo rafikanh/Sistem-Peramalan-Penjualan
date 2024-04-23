@@ -254,7 +254,8 @@
             const dtAktualInput = document.getElementById('dt_aktual').value;
 
             // Memeriksa apakah semua input sudah diisi
-            const isFormFilled = bulanInput.trim() !== '' && tahunInput.trim() !== '' && merekInput.trim() !== '' && tipeInput.trim() !== '' && dtAktualInput.trim() !== '';
+            const isFormFilled = bulanInput !== 'Pilih bulan' && tahunInput !== 'Pilih tahun' && merekInput !== 'Pilih merek' && tipeInput !== 'Pilih tipe' && dtAktualInput !== '';
+
 
             if (isFormFilled) {
                 // Buat objek XMLHttpRequest
