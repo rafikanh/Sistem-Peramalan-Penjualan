@@ -155,44 +155,57 @@
                 }
 
                 readXlsxFile(file).then(function(data) {
-
                     const xhr = new XMLHttpRequest();
 
-                    // Atur callback untuk menangani respons dari server
                     xhr.onreadystatechange = function() {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                             if (xhr.status === 200) {
-                                // Respons dari server adalah data penjualan dalam format JSON
                                 const result = JSON.parse(xhr.responseText);
 
                                 if (result['status'] === 'success') {
                                     Swal.fire("Berhasil", result['message'], "success").then(() => {
                                         location.reload();
                                     });
+                                } else if (result['status'] === 'duplicate') {
+                                    Swal.fire({
+                                        title: 'Data Sudah Ada',
+                                        text: 'Data sudah ada di daftar, apakah ingin mengganti?',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Ganti',
+                                        cancelButtonText: 'Tidak'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // Kirim data duplikat dan tindakan 'replace' ke server
+                                            xhr.open('POST', '../process/process-import-data.php?action=updateData', true);
+                                            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                                            xhr.send('data=' + JSON.stringify(result['data'])); // Kirim data duplikat kembali ke server
+                                        } else {
+                                            // Kirim data baru ke server
+                                            xhr.open('POST', '../process/process-import-data.php', true);
+                                            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                                            xhr.send('data=' + JSON.stringify([])); // Kirim array kosong karena tidak ada data yang akan diimpor
+                                        }
+                                    });
                                 } else {
                                     Swal.fire("Gagal", result['message'], "warning");
                                 }
-
                             } else {
-                                Swal.fire("Gagal", xhr.statusText, "warning");
+                                Swal.fire("Gagal", "Terjadi kesalahan saat mengimpor data", "warning");
                             }
                         }
                     };
 
-                    // Atur jenis dan URL permintaan
+                    // Kirim permintaan ke server
                     xhr.open('POST', '../process/process-import-data.php', true);
-
-                    // Atur header permintaan
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-                    // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
                     xhr.send('data=' + JSON.stringify(data));
                 });
 
             } else {
                 Swal.fire("Gagal", "File belum dipilih", "warning");
             }
-        })
+        });
     </script>
 
     <!-- SweetAlert2 script hapus data -->
