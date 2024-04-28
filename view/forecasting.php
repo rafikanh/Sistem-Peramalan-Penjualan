@@ -24,29 +24,36 @@
                 <a href="../view/history.php" type="button" class="btn btn-info">History</a>
             </div>
 
-            <div class="d-flex">
+            <div class="d-flex mb-2">
                 <div class="mb-1">
-                    <p class="text-forecasting">Nilai alpha saat ini adalah ...</p>
+                    <p class="text-forecasting">Nilai alpha</p>
                 </div>
                 <div class="mb-1 ms-5">
-                    <input type="text" class="input-data-forecasting" id="alpha" placeholder="Masukkan nilai alpha">
+                    <input type="text" class="input-data-forecasting" id="alpha" placeholder="Masukkan nilai alpha" onclick="showSmall('smallContainerAlpha')" onblur="hideSmall('smallContainerAlpha')">
+                    <div class="small" id="smallContainerAlpha">
+                        <small>Rekomendasi nilai alpha : 0.727</small>
+                    </div>
                 </div>
                 <div class="mb-1 ms-2">
                     <button class="btn btn-custom custom-button" id="alphaButton">
-                        <i class="bi bi-pen"></i>
+                        <i class="bi bi-check-lg"></i>
                     </button>
                 </div>
             </div>
+
             <div class="d-flex">
                 <div class="mb-3 beta">
-                    <p class="text-forecasting">Nilai beta saat ini adalah ...</p>
+                    <p class="text-forecasting">Nilai beta</p>
                 </div>
                 <div class="mb-3 ms-5">
-                    <input type="text" class="input-data-forecasting" id="beta" placeholder="Masukkan nilai beta">
+                    <input type="text" class="input-data-forecasting" id="beta" placeholder="Masukkan nilai beta" onclick="showSmall('smallContainerBeta')" onblur="hideSmall('smallContainerBeta')">
+                    <div class="small" id="smallContainerBeta">
+                        <small>Rekomendasi nilai beta : 0.177</small>
+                    </div>
                 </div>
                 <div class="mb-3 ms-2">
                     <button class="btn btn-custom custom-button" id="betaButton">
-                        <i class="bi bi-pen"></i>
+                        <i class="bi bi-check-lg"></i>
                     </button>
                 </div>
             </div>
@@ -500,6 +507,18 @@
                 }
             });
         });
+    </script>
+
+    <script>
+        function showSmall(containerId) {
+            const smallContainer = document.getElementById(containerId);
+            smallContainer.style.display = 'block';
+        }
+
+        function hideSmall(containerId) {
+            const smallContainer = document.getElementById(containerId);
+            smallContainer.style.display = 'none';
+        }
     </script>
 
     <!-- Bootstrap -->

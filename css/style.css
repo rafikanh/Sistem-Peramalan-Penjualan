@@ -312,3 +312,10 @@ select.form-select {
     overflow: hidden; 
     text-overflow: ellipsis; 
 }
+
+.small{
+  margin-top: 2px;
+  font-size: 10px;
+  color: red;
+  display: none;
+}
