@@ -122,6 +122,62 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Import Preview -->
+        <div class="modal fade" id="importModalPreview" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <b class="modal-title" id="importModalLabel">Import Data</b>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body modal-body-scrollable">
+                        <div id="existingDataSection">
+                            <p class="ms-4">Data duplikat</p>
+                            <table class="tablePreviewImportExist ms-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Merek</th>
+                                        <th scope="col">Tipe</th>
+                                        <th scope="col">Bulan</th>
+                                        <th scope="col">Tahun</th>
+                                        <th scope="col">Aktual</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewData">
+                                    <tr></tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                        <div id="newDataSection">
+                            <p class="ms-4">Data Baru</p>
+                            <table class="tablePreviewImportNew ms-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Merek</th>
+                                        <th scope="col">Tipe</th>
+                                        <th scope="col">Bulan</th>
+                                        <th scope="col">Tahun</th>
+                                        <th scope="col">Aktual</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewData">
+                                    <tr></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer modal-footer-custom">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="importBtnAll">Import Semua</button>
+                        <button type="button" class="btn btn-custom" data-bs-dismiss="modal" id="importBtnOnlyNew">Import Data Baru</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Script Search -->
@@ -141,6 +197,11 @@
     <!-- Script Read Excel -->
     <script>
         var importBtn = document.getElementById('importBtn');
+        var importBtnAll = document.getElementById('importBtnAll');
+        var importBtnOnlyNew = document.getElementById('importBtnOnlyNew');
+
+        let importedExistingData = [];
+        let importedNewData = [];
 
         importBtn.addEventListener('click', function() {
             var fileInput = document.getElementById('fileInput');
@@ -155,38 +216,36 @@
                 }
 
                 readXlsxFile(file).then(function(data) {
+
                     const xhr = new XMLHttpRequest();
 
                     xhr.onreadystatechange = function() {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                             if (xhr.status === 200) {
+
                                 const result = JSON.parse(xhr.responseText);
+                                console.log(result);
 
                                 if (result['status'] === 'success') {
-                                    Swal.fire("Berhasil", result['message'], "success").then(() => {
-                                        location.reload();
-                                    });
-                                } else if (result['status'] === 'duplicate') {
-                                    Swal.fire({
-                                        title: 'Data Sudah Ada',
-                                        text: 'Data sudah ada di daftar, apakah ingin mengganti?',
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonText: 'Ganti',
-                                        cancelButtonText: 'Tidak'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            // Kirim data duplikat dan tindakan 'replace' ke server
-                                            xhr.open('POST', '../process/process-import-data.php?action=updateData', true);
-                                            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                                            xhr.send('data=' + JSON.stringify(result['data'])); // Kirim data duplikat kembali ke server
-                                        } else {
-                                            // Kirim data baru ke server
-                                            xhr.open('POST', '../process/process-import-data.php', true);
-                                            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                                            xhr.send('data=' + JSON.stringify([])); // Kirim array kosong karena tidak ada data yang akan diimpor
-                                        }
-                                    });
+                                    importedExistingData = result['existingData'];
+                                    importedNewData = result['newData'];
+                                    updateTableImportedData(result['existingData'], result['newData']);
+                                    const newDataSection = document.getElementById("newDataSection");
+                                    const existingDataSection = document.getElementById("existingDataSection");
+
+                                    if (result['newData'].length == 0) {
+                                        newDataSection.style.display = "none";
+                                    } else {
+                                        newDataSection.style.display = "inline-block";
+                                    }
+
+                                    if (result['existingData'].length == 0) {
+                                        existingDataSection.style.display = "none";
+                                    } else {
+                                        existingDataSection.style.display = "inline";
+                                    }
+
+                                    $('#importModalPreview').modal('show');
                                 } else {
                                     Swal.fire("Gagal", result['message'], "warning");
                                 }
@@ -197,7 +256,7 @@
                     };
 
                     // Kirim permintaan ke server
-                    xhr.open('POST', '../process/process-import-data.php', true);
+                    xhr.open('POST', '../process/check-import-data.php', true);
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     xhr.send('data=' + JSON.stringify(data));
                 });
@@ -206,6 +265,135 @@
                 Swal.fire("Gagal", "File belum dipilih", "warning");
             }
         });
+
+        importBtnOnlyNew.addEventListener('click', function() {
+            const xhr = new XMLHttpRequest();
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+
+                        const result = JSON.parse(xhr.responseText);
+                        console.log(result);
+
+                        if (result['status'] === 'success') {
+                            Swal.fire("Berhasil", result['message'], "success").then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Gagal", result['message'], "warning");
+                        }
+                    } else {
+                        Swal.fire("Gagal", "Terjadi kesalahan saat mengimpor data", "warning");
+                    }
+                }
+            };
+
+            // Kirim permintaan ke server
+            xhr.open('POST', '../process/process-import-data.php', true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.send('newData=' + JSON.stringify(importedNewData));
+        })
+
+        importBtnAll.addEventListener('click', function() {
+            const xhr = new XMLHttpRequest();
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+
+                        const result = JSON.parse(xhr.responseText);
+                        console.log(result);
+
+                        if (result['status'] === 'success') {
+                            Swal.fire("Berhasil", result['message'], "success").then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Gagal", result['message'], "warning");
+                        }
+                    } else {
+                        Swal.fire("Gagal", "Terjadi kesalahan saat mengimpor data", "warning");
+                    }
+                }
+            };
+
+            // Kirim permintaan ke server
+            xhr.open('POST', '../process/process-import-data.php', true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.send('newData=' + JSON.stringify(importedNewData) + '&existingData=' + JSON.stringify(importedExistingData));
+        })
+
+        function updateTableImportedData(existingData, newData) {
+            // Dapatkan elemen tbody dari tabel
+            const tbody = document.querySelector('.tablePreviewImportExist tbody');
+
+            // Kosongkan isi tbody sebelum memperbarui
+            tbody.innerHTML = '';
+
+            // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
+            existingData.forEach(function(rowData, index) {
+                const row = document.createElement('tr');
+
+                // Loop melalui setiap kolom data dan tambahkan ke dalam baris
+                Object.values(rowData).forEach(function(value) {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                });
+
+                // Tambahkan nilai merek, tipe, bulan, tahun, dan aktual dari array existingData ke dalam baris
+                const merekCell = document.createElement('td');
+                const tipeCell = document.createElement('td');
+                const bulanCell = document.createElement('td');
+                const tahunCell = document.createElement('td');
+                const actualCell = document.createElement('td');
+
+                // Pastikan indeks `index` tidak melebihi panjang array `existingData`
+                if (index < existingData.length) {
+                    merekCell.textContent = existingData[index]['merek'];
+                    tipeCell.textContent = existingData[index]['tipe'];
+                    bulanCell.textContent = existingData[index]['bulan'];
+                    tahunCell.textContent = existingData[index]['tahun'];
+                    actualCell.textContent = existingData[index]['actual'];
+                }
+                tbody.appendChild(row);
+            });
+
+            const tbodynew = document.querySelector('.tablePreviewImportNew tbody');
+
+            // Kosongkan isi tbody sebelum memperbarui
+            tbodynew.innerHTML = '';
+
+            // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
+            newData.forEach(function(rowData, index) {
+                const row = document.createElement('tr');
+
+                // Loop melalui setiap kolom data dan tambahkan ke dalam baris
+                Object.values(rowData).forEach(function(value) {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                });
+
+                // Tambahkan nilai merek, tipe, bulan, tahun, dan aktual dari array newData ke dalam baris
+                const merekCell = document.createElement('td');
+                const tipeCell = document.createElement('td');
+                const bulanCell = document.createElement('td');
+                const tahunCell = document.createElement('td');
+                const actualCell = document.createElement('td');
+
+                // Pastikan indeks `index` tidak melebihi panjang array `newData`
+                if (index < existingData.length) {
+                    merekCell.textContent = existingData[index]['merek'];
+                    tipeCell.textContent = existingData[index]['tipe'];
+                    bulanCell.textContent = existingData[index]['bulan'];
+                    tahunCell.textContent = existingData[index]['tahun'];
+                    actualCell.textContent = existingData[index]['actual'];
+                }
+                tbodynew.appendChild(row);
+            });
+        }
     </script>
 
     <!-- SweetAlert2 script hapus data -->

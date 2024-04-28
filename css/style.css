@@ -246,26 +246,26 @@ select.form-select {
 }
 
 .gutter-item p.sub {
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 }
 
 .col-3:nth-child(1) .gutter {
-  background-color: #E8751A;
+  background-color: #e8751a;
   height: 110px;
 }
 
 .col-3:nth-child(2) .gutter {
-  background-color: #87A922;
+  background-color: #87a922;
   height: 110px;
 }
 
 .col-3:nth-child(3) .gutter {
-  background-color: #9B3675;
+  background-color: #9b3675;
   height: 110px;
 }
 
 .col-3:nth-child(4) .gutter {
-  background-color: #006A71;
+  background-color: #006a71;
   height: 110px;
 }
 
@@ -288,4 +288,27 @@ select.form-select {
   top: 0px;
   right: -30px;
   color: white;
+}
+
+.modal-body-scrollable {
+  overflow-y: scroll;
+  max-height: 300px;
+}
+
+.tablePreviewImportExist,
+.tablePreviewImportNew {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tablePreviewImportExist th,
+.tablePreviewImportExist td,
+.tablePreviewImportNew th,
+.tablePreviewImportNew td {
+    padding-left: 30px; 
+    padding-bottom: 8px;
+    width: 20%;
+    white-space: nowrap;
+    overflow: hidden; 
+    text-overflow: ellipsis; 
 }
