@@ -326,16 +326,6 @@
 
         function updateTableImportedData(existingData, newData) {
 
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-            function getMonthName(monthNumber) {
-                if (monthNumber >= 1 && monthNumber <= 12) {
-                    return months[monthNumber - 1]; 
-                } else {
-                    return 'Invalid Month'; 
-                }
-            }
-
             // Dapatkan elemen tbody dari tabel
             const tbody = document.querySelector('.tablePreviewImportExist tbody');
 
@@ -345,13 +335,6 @@
             // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
             existingData.forEach(function(rowData, index) {
                 const row = document.createElement('tr');
-
-                // Loop melalui setiap kolom data dan tambahkan ke dalam baris
-                Object.values(rowData).forEach(function(value) {
-                    const cell = document.createElement('td');
-                    cell.textContent = value;
-                    row.appendChild(cell);
-                });
 
                 // Tambahkan nilai merek, tipe, bulan, tahun, dan aktual dari array existingData ke dalam baris
                 const merekCell = document.createElement('td');
@@ -364,12 +347,19 @@
                 if (index < existingData.length) {
                     merekCell.textContent = existingData[index]['merek'];
                     tipeCell.textContent = existingData[index]['tipe'];
-                    bulanCell.textContent = getMonthName(existingData[index]['bulan']);
-                    console.log(getMonthName(existingData[index]['bulan']));
+                    bulanCell.textContent = getMonthString(existingData[index]['bulan']);
                     tahunCell.textContent = existingData[index]['tahun'];
                     actualCell.textContent = existingData[index]['actual'];
                 }
+
+                tbody.appendChild(merekCell);
+                tbody.appendChild(tipeCell);
+                tbody.appendChild(bulanCell);
+                tbody.appendChild(tahunCell);
+                tbody.appendChild(actualCell);
+
                 tbody.appendChild(row);
+
             });
 
             const tbodynew = document.querySelector('.tablePreviewImportNew tbody');
@@ -380,13 +370,6 @@
             // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
             newData.forEach(function(rowData, index) {
                 const row = document.createElement('tr');
-
-                // Loop melalui setiap kolom data dan tambahkan ke dalam baris
-                Object.values(rowData).forEach(function(value) {
-                    const cell = document.createElement('td');
-                    cell.textContent = value;
-                    row.appendChild(cell);
-                });
 
                 // Tambahkan nilai merek, tipe, bulan, tahun, dan aktual dari array newData ke dalam baris
                 const merekCell = document.createElement('td');
@@ -399,11 +382,18 @@
                 if (index < newData.length) {
                     merekCell.textContent = newData[index]['merek'];
                     tipeCell.textContent = newData[index]['tipe'];
-                    bulanCell.textContent = getMonthName(newData[index]['bulan']);
+                    bulanCell.textContent = getMonthString(newData[index]['bulan']);
                     tahunCell.textContent = newData[index]['tahun'];
                     actualCell.textContent = newData[index]['actual'];
                 }
+                tbodynew.appendChild(merekCell);
+                tbodynew.appendChild(tipeCell);
+                tbodynew.appendChild(bulanCell);
+                tbodynew.appendChild(tahunCell);
+                tbodynew.appendChild(actualCell);
+
                 tbodynew.appendChild(row);
+
             });
         }
     </script>
@@ -433,6 +423,7 @@
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="../utils/dateformat_utils.js"></script>
 </body>
 
 </html>
