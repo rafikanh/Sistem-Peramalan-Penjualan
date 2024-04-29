@@ -134,7 +134,7 @@
                     <div class="modal-body modal-body-scrollable">
                         <div id="existingDataSection">
                             <p class="ms-4">Data duplikat</p>
-                            <table class="tablePreviewImportExist ms-3">
+                            <table class="tablePreviewImportExist ms-3 mb-2">
                                 <thead>
                                     <tr>
                                         <th scope="col">Merek</th>
@@ -325,6 +325,17 @@
         })
 
         function updateTableImportedData(existingData, newData) {
+
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            function getMonthName(monthNumber) {
+                if (monthNumber >= 1 && monthNumber <= 12) {
+                    return months[monthNumber - 1]; 
+                } else {
+                    return 'Invalid Month'; 
+                }
+            }
+
             // Dapatkan elemen tbody dari tabel
             const tbody = document.querySelector('.tablePreviewImportExist tbody');
 
@@ -353,7 +364,8 @@
                 if (index < existingData.length) {
                     merekCell.textContent = existingData[index]['merek'];
                     tipeCell.textContent = existingData[index]['tipe'];
-                    bulanCell.textContent = existingData[index]['bulan'];
+                    bulanCell.textContent = getMonthName(existingData[index]['bulan']);
+                    console.log(getMonthName(existingData[index]['bulan']));
                     tahunCell.textContent = existingData[index]['tahun'];
                     actualCell.textContent = existingData[index]['actual'];
                 }
@@ -384,12 +396,12 @@
                 const actualCell = document.createElement('td');
 
                 // Pastikan indeks `index` tidak melebihi panjang array `newData`
-                if (index < existingData.length) {
-                    merekCell.textContent = existingData[index]['merek'];
-                    tipeCell.textContent = existingData[index]['tipe'];
-                    bulanCell.textContent = existingData[index]['bulan'];
-                    tahunCell.textContent = existingData[index]['tahun'];
-                    actualCell.textContent = existingData[index]['actual'];
+                if (index < newData.length) {
+                    merekCell.textContent = newData[index]['merek'];
+                    tipeCell.textContent = newData[index]['tipe'];
+                    bulanCell.textContent = getMonthName(newData[index]['bulan']);
+                    tahunCell.textContent = newData[index]['tahun'];
+                    actualCell.textContent = newData[index]['actual'];
                 }
                 tbodynew.appendChild(row);
             });
