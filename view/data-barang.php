@@ -38,7 +38,7 @@
             $searchQuery = $_POST['search_query'] ?? '';
 
             // Query SQL untuk mengambil data dari tabel dt_barang
-            $sql = "SELECT id_brg, merek, tipe FROM dt_barang WHERE merek LIKE '%$searchQuery%' OR tipe LIKE '%$searchQuery%'";
+            $sql = "SELECT id_brg, merek, tipe FROM dt_barang WHERE merek LIKE '%$searchQuery%' OR tipe LIKE '%$searchQuery%' ORDER BY id_brg DESC";
             $result = $conn->query($sql);
 
             if ($result === false) {

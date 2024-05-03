@@ -54,7 +54,7 @@
             }
 
             // Tambahkan klausa ORDER BY untuk mengurutkan berdasarkan tahun, bulan, dan merek
-            $sql .= " ORDER BY dp.tahun ASC, dp.bulan ASC, db.merek";
+            $sql .= " ORDER BY dp.tahun DESC, dp.bulan DESC";
 
             $result = $conn->query($sql);
 
