@@ -160,7 +160,7 @@
 
                 <div class="data-aktual">
                     <label for="dt_aktual" class="input-data-label">Data Aktual</label>
-                    <input type="text" class="input-data" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required>
+                    <input type="number" class="input-data" name="dt_aktual" id="dt_aktual" pattern="[0-9]" placeholder="Masukkan data aktual" required>
                 </div>
 
                 <div class="d-flex">
@@ -297,7 +297,7 @@
                                         });
                                     } else if (result.isDenied) {
                                         Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
-                                            window.history.back();
+                                            window.location.href = 'data-penjualan.php';
                                         });
                                     }
                                 });

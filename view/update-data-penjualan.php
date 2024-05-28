@@ -172,7 +172,7 @@
                 <div class="d-flex">
                     <div class="data-aktual">
                         <label for="dt_aktual" class="input-data-label">Data Aktual</label>
-                        <input type="text" class="input-data" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required value="<?php echo isset($data_penjualan['dt_aktual']) ? $data_penjualan['dt_aktual'] : ''; ?>">
+                        <input type="number" class="input-data" name="dt_aktual" id="dt_aktual" placeholder="Masukkan data aktual" required value="<?php echo isset($data_penjualan['dt_aktual']) ? $data_penjualan['dt_aktual'] : ''; ?>">
                     </div>
                 </div>
 
@@ -271,7 +271,7 @@
                         });
                     } else if (result.isDenied) {
                         Swal.fire("Perubahan data tidak disimpan", "", "info").then(() => {
-                            window.history.back();
+                            window.location.href = 'data-penjualan.php';
                         });
                     }
                 });
