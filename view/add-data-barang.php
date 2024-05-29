@@ -80,7 +80,7 @@
                                         });
                                     } else if (result.isDenied) {
                                         Swal.fire("Data baru tidak disimpan", "", "info").then(() => {
-                                            window.history.back();
+                                            window.location.href = 'data-barang.php';
                                         });
                                     }
                                 });

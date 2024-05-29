@@ -118,7 +118,7 @@
                     } else if (result.isDenied) {
                         // Jika pengguna memilih "Jangan Simpan", tampilkan pesan informasi dan kembali ke halaman sebelumnya
                         Swal.fire("Perubahan data tidak disimpan", "", "info").then(() => {
-                            window.history.back();
+                            window.location.href = 'data-barang.php';
                         });
                     }
                 });
