@@ -24,40 +24,6 @@
                 <a href="../view/history.php" type="button" class="btn btn-info">History</a>
             </div>
 
-            <div class="d-flex mb-2">
-                <div class="mb-1">
-                    <p class="text-forecasting">Nilai alpha</p>
-                </div>
-                <div class="mb-1 ms-5">
-                    <input type="text" class="input-data-forecasting" id="alpha" placeholder="Masukkan nilai alpha" onclick="showSmall('smallContainerAlpha')" onblur="hideSmall('smallContainerAlpha')">
-                    <div class="small" id="smallContainerAlpha">
-                        <small>Rekomendasi nilai alpha : 0.727</small>
-                    </div>
-                </div>
-                <div class="mb-1 ms-2">
-                    <button class="btn btn-custom custom-button" id="alphaButton">
-                        <i class="bi bi-check-lg"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="d-flex">
-                <div class="mb-3 beta">
-                    <p class="text-forecasting">Nilai beta</p>
-                </div>
-                <div class="mb-3 ms-5">
-                    <input type="text" class="input-data-forecasting" id="beta" placeholder="Masukkan nilai beta" onclick="showSmall('smallContainerBeta')" onblur="hideSmall('smallContainerBeta')">
-                    <div class="small" id="smallContainerBeta">
-                        <small>Rekomendasi nilai beta : 0.177</small>
-                    </div>
-                </div>
-                <div class="mb-3 ms-2">
-                    <button class="btn btn-custom custom-button" id="betaButton">
-                        <i class="bi bi-check-lg"></i>
-                    </button>
-                </div>
-            </div>
-
             <?php
             include '../koneksi.php';
 
@@ -239,121 +205,81 @@
 
     <!-- Script Untuk Pengambilan Data Bulan Tahun dan Data Aktual Berdasarkan Tipe -->
     <script>
-        // Script untuk menyimpan nilai alpha dan beta
         document.addEventListener('DOMContentLoaded', function() {
             const buttonHitung = document.getElementById('hitungButton');
+            const merekSelect = document.getElementById('merekSelect');
+            const tipeSelect = document.getElementById('tipeSelect');
 
-            // Tambahkan event listener untuk tombol "Hitung"
             buttonHitung.addEventListener('click', function() {
-
-                const alpha = localStorage.getItem('alpha');
-                const beta = localStorage.getItem('beta')
-
                 const selectedMerek = merekSelect.value;
                 const selectedTipe = tipeSelect.value;
 
-                if (alpha == null || beta == null) {
-                    alert('Nilai alpha dan beta harus diisi terlebih dahulu.');
-                } else if (selectedMerek == 'Pilih merek' || selectedTipe == 'Pilih tipe') {
+                if (selectedMerek === 'Pilih merek' || selectedTipe === 'Pilih tipe') {
                     alert('Merek dan tipe harus dipilih terlebih dahulu.');
                 } else {
-                    // Buat objek XMLHttpRequest
                     const xhr = new XMLHttpRequest();
 
-                    // Atur callback untuk menangani respons dari server
-                    xhr.onreadystatechange = async function() {
+                    xhr.onreadystatechange = function() {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                             if (xhr.status === 200) {
-                                // Respons dari server adalah data penjualan dalam format JSON
                                 const dataPenjualan = JSON.parse(xhr.responseText);
-
-                                // Lakukan perhitungan DES di sini   
                                 calculateForecast(dataPenjualan, selectedTipe);
-
                             } else {
                                 console.error('Error fetching data:', xhr.statusText);
                             }
                         }
                     };
 
-                    // Atur jenis dan URL permintaan
                     xhr.open('POST', '../process/get_penjualan.php', true);
-
-                    // Atur header permintaan
                     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-                    // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
                     xhr.send('merek=' + encodeURIComponent(selectedMerek) + '&id_brg=' + encodeURIComponent(selectedTipe));
                 }
             });
 
+            let bestForecast = null;
+
             function calculateForecast(dataPenjualan, selectedTipe) {
-
                 const xhr = new XMLHttpRequest();
-
-                // Atur callback untuk menangani respons dari server
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
-                            // Respons dari server adalah data penjualan dalam format JSON
                             const dataForecast = JSON.parse(xhr.responseText);
+                            const bestResult = dataForecast[dataForecast.length - 1];
 
-                            //ambil bulan dan tahun terakhir dari data penjualan
-                            const lastMonth = dataPenjualan[dataPenjualan.length - 1].bulan_tahun.split(' ')[0];
-                            const lastYear = parseInt(dataPenjualan[dataPenjualan.length - 1].bulan_tahun.split(' ')[1]);
+                            bestForecast = dataForecast[dataForecast.length - 2];
 
-                            // Tentukan bulan terakhir dalam bentuk angka
-                            const lastMonthNumber = getMonthNumber(lastMonth);
+                            if (dataForecast.length >= 2) {
+                                const nextMonth = getNextMonthYear(dataPenjualan);
+                                const nextMonthYearElement = document.querySelector('.me-1');
+                                nextMonthYearElement.textContent = 'Peramalan bulan ' + nextMonth.string;
 
-                            // Tentukan bulan berikutnya
-                            const nextMonth = lastMonthNumber === 12 ? 1 : lastMonthNumber + 1;
+                                const nextForecastData = dataForecast[dataForecast.length - 2]['Forecast'];
+                                updateNextForecast(nextForecastData);
 
-                            // Tentukan tahun berikutnya
-                            const nextYear = lastMonthNumber === 12 ? lastYear + 1 : lastYear;
+                                const resultMape = bestResult["Lowest MAPE"];
+                                saveCurrentForecast(selectedTipe, nextForecastData, resultMape, nextMonth.month, nextMonth.year);
 
-                            // Buat string bulan dan tahun berikutnya
-                            const nextMonthYearString = getMonthString(nextMonth) + ' ' + nextYear;
+                                updateTable(dataPenjualan, bestForecast);
+                            }
 
-                            // Tampilkan bulan dan tahun berikutnya
-                            const nextMonthYearElement = document.querySelector('.me-1');
-                            nextMonthYearElement.textContent = 'Peramalan bulan ' + nextMonthYearString;
-
-                            //update forecast selanjutnya
-                            const nextForecastData = dataForecast[dataForecast.length - 1]['Forecast'];
-                            updateNextForecast(nextForecastData);
-
-                            //hitung mape & simpan ke variable resultMape
-                            const resultMape = calculateMape(dataForecast);
-
-                            //simpan riwayat forecast
-                            saveCurrentForecast(selectedTipe, nextForecastData, resultMape, nextMonth, nextYear);
-
-                            //update data table
-                            updateTable(dataPenjualan, dataForecast);
+                            alert(`Best Alpha: ${bestResult["Best Alpha"]}, Best Beta: ${bestResult["Best Beta"]}, Lowest MAPE: ${bestResult["Lowest MAPE"].toFixed(2)}%`);
                         } else {
                             console.error('Error fetching data:', xhr.statusText);
                         }
                     }
                 };
 
-                // Atur jenis dan URL permintaan
                 xhr.open('POST', '../process/calculate_forecasting.php', true);
-
-                // Atur header permintaan
                 xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-                // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
-                xhr.send('alpha=' + encodeURIComponent(localStorage.getItem('alpha')) + '&beta=' + encodeURIComponent(localStorage.getItem('beta')) + '&data_penjualan=' + encodeURIComponent(JSON.stringify(dataPenjualan)));
+                xhr.send('data_penjualan=' + encodeURIComponent(JSON.stringify(dataPenjualan)));
             }
 
             function saveCurrentForecast(id_brg, res_forecast, mape, bulan, tahun) {
                 const xhr = new XMLHttpRequest();
 
-                // Atur callback untuk menangani respons dari server
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
-                            // Respons dari server adalah data penjualan dalam format JSON
                             const result = JSON.parse(xhr.responseText);
                             console.log(result);
                         } else {
@@ -362,59 +288,36 @@
                     }
                 };
 
-                // Atur jenis dan URL permintaan
                 xhr.open('POST', '../process/process-save-history.php', true);
-
-                // Atur header permintaan
                 xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-                // Kirim permintaan dengan merek dan tipe yang dipilih sebagai data POST
-                xhr.send('id_brg=' + id_brg + '&res_forecast=' + res_forecast + '&mape=' + mape + '&bulan=' + bulan + '&tahun=' + tahun);
+                xhr.send('id_brg[]=' + encodeURIComponent(id_brg) + '&res_forecast=' + encodeURIComponent(JSON.stringify(res_forecast)) + '&mape=' + encodeURIComponent(mape) + '&bulan=' + encodeURIComponent(bulan) + '&tahun=' + encodeURIComponent(tahun));
             }
 
             function updateNextForecast(resultForecast) {
                 const nextForecast = document.getElementById('nextForecast');
-                nextForecast.textContent = ' : ' + resultForecast.toFixed(2);
-            }
-
-            function calculateMape(dataForecast) {
-                const mapeValue = document.getElementById('mapeValue');
-                const countPercentError = document.getElementById('countPercentError');
-
-                let totalPercentError = 0;
-
-                dataForecast.forEach(element => {
-                    totalPercentError += element['% Error'];
-                });
-
-                countPercentError.textContent = totalPercentError.toFixed(2) + '%';
-
-                resultMape = (totalPercentError / (dataForecast.length - 1)).toFixed(2);
-
-                mapeValue.textContent = ' : ' + resultMape + ' %';
-                return resultMape;
+                if (resultForecast !== undefined && !isNaN(resultForecast)) {
+                    nextForecast.textContent = ' : ' + resultForecast.toFixed(2);
+                } else {
+                    nextForecast.textContent = ' : N/A';
+                }
             }
 
             // Fungsi untuk memperbarui tabel dengan data penjualan dan hasil perhitungan DES
             function updateTable(dataPenjualan, forecasts) {
-                // Dapatkan elemen tbody dari tabel
                 const tbody = document.querySelector('.table tbody');
-
-                // Kosongkan isi tbody sebelum memperbarui
                 tbody.innerHTML = '';
 
-                // Loop melalui data penjualan dan tambahkan baris baru ke dalam tbody
                 dataPenjualan.forEach(function(rowData, index) {
                     const row = document.createElement('tr');
 
-                    // Loop melalui setiap kolom data dan tambahkan ke dalam baris
                     Object.values(rowData).forEach(function(value) {
                         const cell = document.createElement('td');
                         cell.textContent = value;
                         row.appendChild(cell);
                     });
 
-                    // Tambahkan nilai Level, Trend, dan Forecast dari array forecasts ke dalam baris
+                    const forecastData = forecasts[index];
+
                     const levelCell = document.createElement('td');
                     const trendCell = document.createElement('td');
                     const forecastCell = document.createElement('td');
@@ -422,14 +325,13 @@
                     const abserrorCell = document.createElement('td');
                     const percentageerrorCell = document.createElement('td');
 
-                    // Pastikan indeks `index` tidak melebihi panjang array `forecasts`
-                    if (index < forecasts.length) {
-                        levelCell.textContent = forecasts[index]['Level'].toFixed(2);
-                        trendCell.textContent = forecasts[index]['Trend'].toFixed(2);
-                        forecastCell.textContent = forecasts[index]['Forecast'].toFixed(2);
-                        errorCell.textContent = forecasts[index]['Error'].toFixed(2);
-                        abserrorCell.textContent = forecasts[index]['Abs Error'].toFixed(2);
-                        percentageerrorCell.textContent = forecasts[index]['% Error'].toFixed(2) + '%';
+                    if (forecastData) {
+                        levelCell.textContent = forecastData['Level'] !== undefined ? forecastData['Level'].toFixed(2) : 'N/A';
+                        trendCell.textContent = forecastData['Trend'] !== undefined ? forecastData['Trend'].toFixed(2) : 'N/A';
+                        forecastCell.textContent = forecastData['Forecast'] !== undefined ? forecastData['Forecast'].toFixed(2) : 'N/A';
+                        errorCell.textContent = forecastData['Error'] !== undefined ? forecastData['Error'].toFixed(2) : 'N/A';
+                        abserrorCell.textContent = forecastData['Abs Error'] !== undefined ? forecastData['Abs Error'].toFixed(2) : 'N/A';
+                        percentageerrorCell.textContent = forecastData['% Error'] !== undefined ? forecastData['% Error'].toFixed(2) + '%' : 'N/A';
                     } else {
                         levelCell.textContent = 'N/A';
                         trendCell.textContent = 'N/A';
@@ -449,77 +351,24 @@
                     tbody.appendChild(row);
                 });
             }
+
+            function getNextMonthYear(dataPenjualan) {
+                const lastMonth = dataPenjualan[dataPenjualan.length - 1].bulan_tahun.split(' ')[0];
+                const lastYear = parseInt(dataPenjualan[dataPenjualan.length - 1].bulan_tahun.split(' ')[1]);
+
+                const lastMonthNumber = getMonthNumber(lastMonth);
+                const nextMonth = lastMonthNumber === 12 ? 1 : lastMonthNumber + 1;
+                const nextYear = lastMonthNumber === 12 ? lastYear + 1 : lastYear;
+
+                return {
+                    month: nextMonth,
+                    year: nextYear,
+                    string: getMonthString(nextMonth) + ' ' + nextYear
+                };
+            }
         });
     </script>
 
-    <!-- Script untuk menyimpan nilai alpha dan beta -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Bersihkan nilai alpha dan beta dari local storage saat halaman dimuat
-            localStorage.removeItem('alpha');
-            localStorage.removeItem('beta');
-
-            // Ambil elemen input alpha dan beta
-            const alphaInput = document.getElementById('alpha');
-            const betaInput = document.getElementById('beta');
-
-            // Setel nilai input alpha dan beta ke kosong saat halaman dimuat
-            alphaInput.value = '';
-            betaInput.value = '';
-
-            // Ambil elemen tombol "Pen" untuk alpha dan beta
-            const buttonAlpha = document.getElementById('alphaButton');
-            const buttonBeta = document.getElementById('betaButton');
-
-            // Tambahkan event listener untuk tombol "Pen" alpha
-            buttonAlpha.addEventListener('click', function() {
-                // Ambil nilai alpha dari input
-                const alphaInputValue = parseFloat(alphaInput.value);
-
-                // Periksa apakah nilai alpha berada dalam rentang yang diizinkan (0.1 - 0.9)
-                if (alphaInputValue >= 0.1 && alphaInputValue <= 0.9) {
-                    // Simpan nilai alpha ke dalam localStorage dengan kunci "alpha"
-                    localStorage.setItem('alpha', alphaInputValue);
-
-                    // Beri notifikasi bahwa nilai alpha telah disimpan
-                    alert('Nilai alpha telah disimpan: ' + alphaInputValue);
-                } else {
-                    // Tampilkan alert jika nilai alpha tidak berada dalam rentang yang diizinkan
-                    alert('Nilai alpha harus berada dalam rentang 0.1 sampai 0.9');
-                }
-            });
-
-            // Tambahkan event listener untuk tombol "Pen" beta
-            buttonBeta.addEventListener('click', function() {
-                // Ambil nilai beta dari input
-                const betaInputValue = parseFloat(betaInput.value);
-
-                // Periksa apakah nilai beta berada dalam rentang yang diizinkan (0.1 - 0.9)
-                if (betaInputValue >= 0.1 && betaInputValue <= 0.9) {
-                    // Simpan nilai beta ke dalam localStorage dengan kunci "beta"
-                    localStorage.setItem('beta', betaInputValue);
-
-                    // Beri notifikasi bahwa nilai beta telah disimpan
-                    alert('Nilai beta telah disimpan: ' + betaInputValue);
-                } else {
-                    // Tampilkan alert jika nilai beta tidak berada dalam rentang yang diizinkan
-                    alert('Nilai beta harus berada dalam rentang 0.1 sampai 0.9');
-                }
-            });
-        });
-    </script>
-
-    <script>
-        function showSmall(containerId) {
-            const smallContainer = document.getElementById(containerId);
-            smallContainer.style.display = 'block';
-        }
-
-        function hideSmall(containerId) {
-            const smallContainer = document.getElementById(containerId);
-            smallContainer.style.display = 'none';
-        }
-    </script>
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
