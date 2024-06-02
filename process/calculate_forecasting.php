@@ -7,13 +7,11 @@ if (isset($_POST['data_penjualan'])) {
     // Ambil data penjualan
     $dataPenjualan = json_decode($_POST['data_penjualan'], true) ?? [];
 
-    // Inisialisasi array untuk menyimpan hasil perhitungan MAPE
-    $results = [];
-
     // Inisialisasi variabel untuk melacak MAPE terendah
     $lowestMAPE = PHP_FLOAT_MAX;
     $bestAlpha = null;
     $bestBeta = null;
+    $bestForecasts = [];
 
     // Loop untuk alpha dan beta dalam rentang 0.1 hingga 0.9 dengan langkah 0.1
     for ($alpha = 0.1; $alpha <= 0.9; $alpha += 0.1) {
@@ -75,28 +73,23 @@ if (isset($_POST['data_penjualan'])) {
             }
             $mape = $totalPercentageError / count($dataPenjualan);
 
-            // Simpan hasil MAPE untuk kombinasi alpha dan beta ini
-            $results[] = [
-                "Alpha" => $alpha,
-                "Beta" => $beta,
-                "MAPE" => $mape,
-            ];
-
             // Cek jika MAPE saat ini adalah yang terendah
             if ($mape < $lowestMAPE) {
                 $lowestMAPE = $mape;
                 $bestAlpha = $alpha;
                 $bestBeta = $beta;
+                $bestForecasts = $forecasts;
             }
         }
     }
 
     // Tambahkan MAPE terendah dan parameter alpha, beta terbaik ke hasil
-    $results[] = [
+    $results = array(
         "Best Alpha" => $bestAlpha,
         "Best Beta" => $bestBeta,
         "Lowest MAPE" => $lowestMAPE,
-    ];
+        "Best Forecasts" => $bestForecasts,
+    );
 
     // Kembalikan hasil perhitungan dalam format JSON
     header('Content-Type: application/json');

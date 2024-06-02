@@ -236,39 +236,38 @@
                 }
             });
 
-            let bestForecast = null;
-
             function calculateForecast(dataPenjualan, selectedTipe) {
                 const xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
-                            const dataForecast = JSON.parse(xhr.responseText);
-                            const bestResult = dataForecast[dataForecast.length - 1];
 
-                            bestForecast = dataForecast[dataForecast.length - 2];
+                            const response = JSON.parse(xhr.responseText);
+                            console.log(response);
+                            const dataForecast = response['Best Forecasts'];
 
                             if (dataForecast.length >= 2) {
                                 const nextMonth = getNextMonthYear(dataPenjualan);
                                 const nextMonthYearElement = document.querySelector('.me-1');
                                 nextMonthYearElement.textContent = 'Peramalan bulan ' + nextMonth.string;
 
-                                const nextForecastData = dataForecast[dataForecast.length - 2]['Forecast'];
+                                const lastForecast = dataForecast[dataForecast.length - 1];
+                                const nextForecastData = lastForecast['Level'] + lastForecast['Trend'];
                                 updateNextForecast(nextForecastData);
 
-                                const resultMape = bestResult["Lowest MAPE"];
+                                const resultMape = response["Lowest MAPE"];
+                                const mapeValue = document.getElementById('mapeValue');
+                                mapeValue.textContent = ' : ' + resultMape.toFixed(2) + '%';
+
                                 saveCurrentForecast(selectedTipe, nextForecastData, resultMape, nextMonth.month, nextMonth.year);
-
-                                updateTable(dataPenjualan, bestForecast);
+                                updateTable(dataPenjualan, dataForecast);
                             }
-
-                            alert(`Best Alpha: ${bestResult["Best Alpha"]}, Best Beta: ${bestResult["Best Beta"]}, Lowest MAPE: ${bestResult["Lowest MAPE"].toFixed(2)}%`);
+                            alert(`Alpha Terbaik: ${response["Best Alpha"].toFixed(2)}, Beta Terbaik: ${response["Best Beta"].toFixed(2)}, MAPE Terendah: ${response["Lowest MAPE"].toFixed(2)}%`);
                         } else {
                             console.error('Error fetching data:', xhr.statusText);
                         }
                     }
                 };
-
                 xhr.open('POST', '../process/calculate_forecasting.php', true);
                 xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                 xhr.send('data_penjualan=' + encodeURIComponent(JSON.stringify(dataPenjualan)));
@@ -290,7 +289,7 @@
 
                 xhr.open('POST', '../process/process-save-history.php', true);
                 xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                xhr.send('id_brg[]=' + encodeURIComponent(id_brg) + '&res_forecast=' + encodeURIComponent(JSON.stringify(res_forecast)) + '&mape=' + encodeURIComponent(mape) + '&bulan=' + encodeURIComponent(bulan) + '&tahun=' + encodeURIComponent(tahun));
+                xhr.send('id_brg=' + encodeURIComponent(id_brg) + '&res_forecast=' + encodeURIComponent(JSON.stringify(res_forecast)) + '&mape=' + encodeURIComponent(mape) + '&bulan=' + encodeURIComponent(bulan) + '&tahun=' + encodeURIComponent(tahun));
             }
 
             function updateNextForecast(resultForecast) {
@@ -368,7 +367,6 @@
             }
         });
     </script>
-
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
