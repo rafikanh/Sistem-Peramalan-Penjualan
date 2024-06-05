@@ -241,7 +241,6 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
-
                             const response = JSON.parse(xhr.responseText);
                             console.log(response);
                             const dataForecast = response['Best Forecasts'];
@@ -252,7 +251,13 @@
                                 nextMonthYearElement.textContent = 'Peramalan bulan ' + nextMonth.string;
 
                                 const lastForecast = dataForecast[dataForecast.length - 1];
-                                const nextForecastData = lastForecast['Level'] + lastForecast['Trend'];
+                                let nextForecastData = lastForecast['Level'] + lastForecast['Trend'];
+
+                                // Set nextForecastData to 0 if it is negative
+                                if (nextForecastData < 0) {
+                                    nextForecastData = 0;
+                                }
+
                                 updateNextForecast(nextForecastData);
 
                                 const resultMape = response["Lowest MAPE"];
@@ -274,6 +279,11 @@
             }
 
             function saveCurrentForecast(id_brg, res_forecast, mape, bulan, tahun) {
+                // Set res_forecast to 0 if it is negative
+                if (res_forecast < 0) {
+                    res_forecast = 0;
+                }
+
                 const xhr = new XMLHttpRequest();
 
                 xhr.onreadystatechange = function() {
@@ -295,6 +305,10 @@
             function updateNextForecast(resultForecast) {
                 const nextForecast = document.getElementById('nextForecast');
                 if (resultForecast !== undefined && !isNaN(resultForecast)) {
+                    // Set resultForecast to 0 if it is negative
+                    if (resultForecast < 0) {
+                        resultForecast = 0;
+                    }
                     nextForecast.textContent = ' : ' + resultForecast.toFixed(2);
                 } else {
                     nextForecast.textContent = ' : N/A';
@@ -325,9 +339,13 @@
                     const percentageerrorCell = document.createElement('td');
 
                     if (forecastData) {
+                        // Jika nilai forecast negatif, atur menjadi 0
+                        let forecastValue = forecastData['Forecast'] !== undefined ? forecastData['Forecast'] : NaN;
+                        forecastValue = !isNaN(forecastValue) && forecastValue < 0 ? 0 : forecastValue;
+
                         levelCell.textContent = forecastData['Level'] !== undefined ? forecastData['Level'].toFixed(2) : 'N/A';
                         trendCell.textContent = forecastData['Trend'] !== undefined ? forecastData['Trend'].toFixed(2) : 'N/A';
-                        forecastCell.textContent = forecastData['Forecast'] !== undefined ? forecastData['Forecast'].toFixed(2) : 'N/A';
+                        forecastCell.textContent = !isNaN(forecastValue) ? forecastValue.toFixed(2) : 'N/A';
                         errorCell.textContent = forecastData['Error'] !== undefined ? forecastData['Error'].toFixed(2) : 'N/A';
                         abserrorCell.textContent = forecastData['Abs Error'] !== undefined ? forecastData['Abs Error'].toFixed(2) : 'N/A';
                         percentageerrorCell.textContent = forecastData['% Error'] !== undefined ? forecastData['% Error'].toFixed(2) + '%' : 'N/A';
